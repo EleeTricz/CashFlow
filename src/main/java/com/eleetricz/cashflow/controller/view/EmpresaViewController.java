@@ -1,0 +1,77 @@
+package com.eleetricz.cashflow.controller.view;
+
+import com.eleetricz.cashflow.entity.Competencia;
+import com.eleetricz.cashflow.entity.Empresa;
+import com.eleetricz.cashflow.entity.Usuario;
+import com.eleetricz.cashflow.service.CompetenciaService;
+import com.eleetricz.cashflow.service.EmpresaService;
+import com.eleetricz.cashflow.service.LancamentoService;
+import com.eleetricz.cashflow.service.UsuarioService;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
+
+import java.math.BigDecimal;
+import java.util.List;
+import java.util.Map;
+
+@Controller
+@RequestMapping("/empresastf")
+public class EmpresaViewController {
+    final private EmpresaService empresaService;
+    final private UsuarioService usuarioService;
+    final private CompetenciaService competenciaService;
+    final private LancamentoService lancamentoService;
+
+    public EmpresaViewController(EmpresaService empresaService, UsuarioService usuarioService, CompetenciaService competenciaService, LancamentoService lancamentoService) {
+        this.empresaService = empresaService;
+        this.usuarioService = usuarioService;
+        this.competenciaService = competenciaService;
+        this.lancamentoService = lancamentoService;
+    }
+
+    @GetMapping("/usuario")
+    public String listarPorUsuario(@RequestParam("usuarioId") Long usuarioId, Model model) {
+        Usuario usuario = usuarioService.buscarPorId(usuarioId);
+        List<Empresa> empresas = empresaService.listarPorUsuario(usuario);
+        model.addAttribute("empresas", empresas);
+        model.addAttribute("usuarios", usuarioService.listarTodos());
+        return "painel";
+    }
+
+    @GetMapping("/todas")
+    public String listarTodas(Model model) {
+        List<Empresa> empresas = empresaService.listarTodas();
+        model.addAttribute("empresas", empresas);
+        model.addAttribute("usuarios", usuarioService.listarTodos());
+        return "painel";  // Nome da sua página Thymeleaf
+    }
+
+    @GetMapping("/nova")
+    public String novaEmpresaForm(Model model) {
+        model.addAttribute("empresa", new Empresa());
+        model.addAttribute("usuarios", usuarioService.listarTodos()); // para o select
+        return "empresa-form"; // esse é o nome do HTML com o formulário
+    }
+
+    @GetMapping("/{id}")
+    public String visualizarEmpresa(@PathVariable Long id, Model model) {
+        Empresa empresa = empresaService.buscarPorId(id);
+        List<Competencia> competencias = competenciaService.listarPorEmpresa(empresa);
+        BigDecimal saldoTotal = lancamentoService.calcularSaldoPorEmpresa(empresa);
+        Map<String, BigDecimal> saldoPorMes = lancamentoService.calcularSaldoPorCompetencia(empresa);
+
+        model.addAttribute("empresa", empresa);
+        model.addAttribute("competencias", competencias);
+        model.addAttribute("saldoTotal", saldoTotal);
+        model.addAttribute("saldoPorMes", saldoPorMes);
+        return "empresa-visualizar";
+    }
+
+    @PostMapping
+    public String salvar(@ModelAttribute Empresa empresa) {
+        empresaService.salvar(empresa);
+        return "redirect:/empresastf/todas";
+    }
+
+}
