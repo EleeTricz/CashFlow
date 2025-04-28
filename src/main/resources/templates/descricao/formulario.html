@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns="http://www.w3.org/1999/html">
+<head>
+    <title>Criar Nova Descrição</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8 bg-gray-50">
+
+<!-- Título da página -->
+<h1 class="text-3xl font-semibold text-center text-green-600 mb-8">Criar Nova Descrição</h1>
+
+<!-- Formulário -->
+<form th:action="@{/descricoestf}" th:object="${descricao}" method="post" class="space-y-6 max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+    <!-- Campo para o ID da empresa -->
+    <input type="hidden" name="empresaId" th:value="${empresaId}" />
+
+    <!-- Faltava este campo oculto para competenciaId -->
+    <input type="hidden" name="competenciaId" th:value="${competenciaId}" />
+
+    <!-- Nome da descrição -->
+    <div>
+        <label class="block text-lg font-medium text-gray-700">Nome</label>
+        <input type="text" th:field="*{nome}" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" required />
+    </div>
+
+    <!-- Tipo da descrição (Entrada ou Saída) -->
+    <div>
+        <label class="block text-lg font-medium text-gray-700">Tipo</label>
+        <select th:field="*{tipo}" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" required>
+            <option value="ENTRADA">Entrada</option>
+            <option value="SAIDA">Saída</option>
+        </select>
+    </div>
+
+    <!-- Código Crédito -->
+    <div>
+        <label class="block text-lg font-medium text-gray-700">Código Crédito</label>
+        <input type="text" th:field="*{codigoCredito}" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" required />
+    </div>
+
+    <!-- Código Débito -->
+    <div>
+        <label class="block text-lg font-medium text-gray-700">Código Débito</label>
+        <input type="text" th:field="*{codigoDebito}" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" required />
+    </div>
+
+    <!-- Código Histórico -->
+    <div>
+        <label class="block text-lg font-medium text-gray-700">Código Histórico</label>
+        <input type="text" th:field="*{codigoHistorico}" class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500" required />
+    </div>
+
+    <!-- Botões -->
+    <div class="flex space-x-4 mt-6">
+        <button type="submit" class="bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300">Salvar</button>
+        <a th:href="@{'/lancamentostf/novo/' + ${empresaId} + '/' + ${competenciaId}}" class="bg-gray-400 text-white px-6 py-3 rounded-md hover:bg-gray-500 transition duration-300">Voltar</a>
+    </div>
+</form>
+
+</body>
+</html>

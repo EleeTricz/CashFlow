@@ -2,33 +2,49 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Nova Empresa</title>
+    <title>Cadastrar Nova Empresa</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-gray-100 text-gray-900">
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-6">Cadastrar Nova Empresa</h1>
+<body class="bg-gray-50 text-gray-900">
 
-    <form th:action="@{/empresastf}" th:object="${empresa}" method="post" class="space-y-4">
-        <label class="block">
-            Nome da Empresa:
-            <input type="text" th:field="*{nome}" class="border p-2 w-full rounded" />
-        </label>
+<div class="container mx-auto p-8">
+    <!-- Título -->
+    <header class="mb-8">
+        <h1 class="text-3xl font-extrabold text-gray-800">Cadastrar Nova Empresa</h1>
+    </header>
 
-        <label class="block">
-            Usuário:
-            <select th:field="*{usuario}" class="border p-2 w-full rounded">
-                <option th:each="usuario : ${usuarios}"
-                        th:value="${usuario.id}"
-                        th:text="${usuario.nome}"></option>
-            </select>
-        </label>
+    <!-- Formulário de Cadastro -->
+    <form th:action="@{/empresastf}" th:object="${empresa}" method="post" class="bg-white shadow-lg rounded-lg p-8 space-y-6">
 
-        <div class="flex gap-4">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded">Salvar</button>
-            <a href="/empresastf/todas" class="text-gray-600 underline">Cancelar</a>
+        <!-- Campo Nome da Empresa -->
+        <div class="space-y-2">
+            <label for="nome" class="block text-lg font-semibold text-gray-700">Nome da Empresa</label>
+            <input type="text" th:field="*{nome}" id="nome" placeholder="Digite o nome da empresa"
+                   class="w-full p-3 border rounded-md focus:ring-2 focus:ring-green-500 transition duration-300">
         </div>
+
+        <!-- Campo Usuário -->
+        <div class="space-y-2">
+            <label for="usuario" class="block text-lg font-semibold text-gray-700">Responsável</label>
+            <select th:field="*{usuario}" id="usuario"
+                    class="w-full p-3 border rounded-md focus:ring-2 focus:ring-green-500 transition duration-300">
+                <option value="" disabled selected>Selecione o usuário responsável</option>
+                <option th:each="usuario : ${usuarios}" th:value="${usuario.id}" th:text="${usuario.nome}"></option>
+            </select>
+        </div>
+
+        <!-- Botões de Ação -->
+        <div class="flex gap-6 justify-between">
+            <button type="submit" class="bg-green-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-green-600 focus:ring-2 focus:ring-green-500 transition duration-300">
+                Salvar
+            </button>
+            <a href="/empresastf/todas" class="text-gray-600 hover:text-gray-800 underline">
+                Cancelar
+            </a>
+        </div>
+
     </form>
 </div>
+
 </body>
 </html>

@@ -25,7 +25,7 @@ public class LancamentoViewController {
     @PostMapping("/salvar")
     public String salvar(@ModelAttribute Lancamento lancamento) {
         lancamentoService.salvar(lancamento);
-        return "redirect:/lancamentos/empresa/" + lancamento.getEmpresa().getId();
+        return "redirect:/lancamentostf/empresa/" + lancamento.getEmpresa().getId();
     }
 
 
@@ -61,23 +61,30 @@ public class LancamentoViewController {
         return "lancamentos/listar-por-competencia";
     }
 
-    @GetMapping("/novo/{empresaId}")
-    public String novoLancamento(@PathVariable Long empresaId, Model model) {
+    @GetMapping("/novo/{empresaId}/{competenciaId}")
+    public String novoLancamento(@PathVariable Long empresaId, @PathVariable Long competenciaId, Model model) {
         Empresa empresa = empresaService.buscarPorId(empresaId);
         List<Competencia> competencias = competenciaService.listarPorEmpresa(empresa);
 
+        Competencia competencia = competenciaService.buscarPorId(competenciaId);
+
         List<Descricao> descricoes = descricaoService.listarTodas();  // Buscar todas as descrições
-        model.addAttribute("descricoes", descricoes);  // Lista de descrições
+
 
         List<Usuario> usuarios = usuarioService.listarTodos(); // Buscar todos os usuarios
-        model.addAttribute("usuarios", usuarios); // Listar todos os usuarios
 
+
+        // monta o objeto de domínio
         Lancamento lancamento = new Lancamento();
         lancamento.setEmpresa(empresa);
+        lancamento.setCompetencia(competencia);
 
         model.addAttribute("empresa", empresa);
         model.addAttribute("lancamento", lancamento);
         model.addAttribute("competencias", competencias);
+        model.addAttribute("competencia", competencia); // Pegar competencia
+        model.addAttribute("usuarios", usuarios); // Listar todos os usuarios
+        model.addAttribute("descricoes", descricoes);  // Lista de descrições
 
         return "lancamentos/formulario";
     }

@@ -4,34 +4,69 @@
     <title>Lançamentos da Empresa</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-8 bg-gray-100">
-<h1 class="text-2xl font-bold mb-4" th:text="'Lançamentos - ' + ${empresa.nome}">Empresa</h1>
+<body class="bg-gray-50 font-sans leading-relaxed">
 
-<div class="mb-4">
-    <p class="font-semibold text-gray-700">Saldo Total:
-        <span class="text-green-700" th:text="'R$ ' + ${#numbers.formatDecimal(saldo, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
-    </p>
+<div class="container mx-auto px-6 my-8">
+    <h1 class="text-3xl font-bold text-green-600 mb-6" th:text="'Lançamentos - ' + ${empresa.nome}">Empresa</h1>
+    <!-- Link de retorno -->
+        <a th:href="@{/empresastf/{empresaId}(empresaId=${empresa.id})}"
+           class="text-blue-600 hover:text-blue-700 underline">
+            Voltar para a Empresa
+        </a>
 </div>
 
-<a th:href="@{/lancamentostf/novo/{id}(id=${empresa.id})}" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Novo Lançamento</a>
+<!-- Seção do saldo -->
+<div class="container mx-auto px-6 my-8">
+    <div class="mb-6">
+        <p class="font-semibold text-lg text-gray-700">Saldo Total:
+            <span class="text-green-600 font-extrabold" th:text="'R$ ' + ${#numbers.formatDecimal(saldo, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</span>
+        </p>
+    </div>
 
-<table class="table-auto w-full mt-6 bg-white shadow rounded">
-    <thead class="bg-gray-200">
-    <tr>
-        <th class="p-2 text-left">Descrição</th>
-        <th class="p-2 text-left">Tipo</th>
-        <th class="p-2 text-left">Valor</th>
-        <th class="p-2 text-left">Competência</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="l : ${lancamentos}" class="border-t">
-        <td class="p-2" th:text="${l.descricao}">Descrição</td>
-        <td class="p-2" th:text="${l.tipo}">ENTRADA</td>
-        <td class="p-2" th:text="'R$ ' + ${#numbers.formatDecimal(l.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
-        <td class="p-2" th:text="${l.competencia.mes} + '/' + ${l.competencia.ano}">03/2024</td>
-    </tr>
-    </tbody>
-</table>
+    <!-- Botão de novo lançamento -->
+    <a th:href="@{/lancamentostf/novo/{empresaId}(empresaId=${empresa.id})}"
+       class="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gradient-to-l hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 transition duration-200 mb-6">
+        Novo Lançamento
+    </a>
+
+    <!-- Tabela de lançamentos -->
+    <table class="w-full mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
+        <thead class="bg-green-200">
+        <tr>
+            <th class="p-3 text-left text-sm text-gray-600">Descrição</th>
+            <th class="p-3 text-left text-sm text-gray-600">Débito</th>
+            <th class="p-3 text-left text-sm text-gray-600">Crédito</th>
+            <th class="p-3 text-left text-sm text-gray-600">Histórico</th>
+            <th class="p-3 text-left text-sm text-gray-600">Tipo</th>
+            <th class="p-3 text-left text-sm text-gray-600">Valor</th>
+            <th class="p-3 text-left text-sm text-gray-600">Competência</th>
+            <th class="p-3 text-left text-sm text-gray-600">Data Ocorrência</th> <!-- Novo cabeçalho para Data Ocorrência -->
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="l : ${lancamentos}" class="border-t hover:bg-green-50">
+            <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.nome}">Descrição</td>
+            <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoDebito}">Débito</td>
+            <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoCredito}">Crédito</td>
+            <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoHistorico}">Histórico</td>
+            <td class="p-3 text-sm" th:text="${l.tipo}" th:classappend="${l.tipo == 'ENTRADA' ? 'text-green-600' : 'text-red-600'}">Tipo</td>
+            <td class="p-3 text-sm text-gray-800" th:text="'R$ ' + ${#numbers.formatDecimal(l.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+            <td class="p-3 text-sm text-gray-800"
+                th:text="${ l.competenciaReferida != null
+                       ? l.competenciaReferida.mes + '/' + l.competenciaReferida.ano
+                       : '-' }">
+                <!-- fallback '-' se for null -->
+            </td>
+            <td class="p-3 text-sm text-gray-800"
+                th:text="${l.dataOcorrencia != null
+                       ? l.dataOcorrencia.format(
+                           T(java.time.format.DateTimeFormatter)
+                             .ofPattern('dd/MM/yyyy'))
+                       : ''}">01/01/2024</td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
 </body>
 </html>

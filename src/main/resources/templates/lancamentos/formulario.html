@@ -4,54 +4,94 @@
     <title>Novo Lançamento</title>
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="p-8 bg-white">
-<h1 class="text-2xl font-bold mb-6">Novo Lançamento</h1>
+<body class="bg-gradient-to-r from-gray-100 via-gray-200 to-gray-300 min-h-screen flex items-center justify-center p-8">
+<div class="bg-white shadow-2xl rounded-xl p-8 w-full max-w-2xl border border-gray-300">
+    <h1 class="text-4xl font-bold text-center text-gray-800 mb-8">Novo Lançamento</h1>
 
-<form th:action="@{/lancamentostf/salvar}" method="post" th:object="${lancamento}" class="space-y-4 max-w-lg">
-    <input type="hidden" th:field="*{empresa.id}" />
+    <form th:action="@{/lancamentostf/salvar}"
+          method="post"
+          th:object="${lancamento}"
+          class="space-y-6">
 
-    <div>
-        <label for="descricao" class="block font-medium">Descrição</label>
-        <select id="descricao" th:field="*{descricao}" class="w-full p-2 border rounded">
-            <option value="" disabled selected>Selecione uma descrição</option>
-            <option th:each="descricao : ${descricoes}"
-                    th:value="${descricao.id}"
-                    th:text="${descricao.nome}">Descrição</option>
-        </select>
-    </div>
+        <!-- Campo oculto para Empresa -->
+        <input type="hidden" th:field="*{empresa.id}" />
 
-    <div>
-        <label for="usuario" class="block font-medium">Usuario</label>
-        <select id="usuario" th:field="*{usuario}" class="w-full p-2 border rounded">
-            <option value="" disabled selected>Selecione uma descrição</option>
-            <option th:each="usuario : ${usuarios}"
-                    th:value="${usuario.id}"
-                    th:text="${usuario.nome}">Usuario</option>
-        </select>
-    </div>
+        <!-- Campo oculto para Competência -->
+        <input type="hidden" th:field="*{competencia.id}" />
 
-    <div>
-        <label class="block font-medium">Valor</label>
-        <input type="number" step="0.01" th:field="*{valor}" class="w-full p-2 border rounded" required />
-    </div>
+        <!-- Descrição -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+                <label for="descricao" class="block text-sm font-medium text-gray-700 mb-1">Descrição</label>
+                <div class="flex space-x-2">
+                    <select id="descricao" th:field="*{descricao}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
+                        <option value="" disabled selected>Selecione uma descrição</option>
+                        <option th:each="descricao : ${descricoes}"
+                                th:value="${descricao.id}"
+                                th:text="${descricao.nome}">Descrição</option>
+                    </select>
+                    <a th:href="@{/descricoestf/novo(empresaId=${empresa.id}, competenciaId=${competencia.id})}"
+                       class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 focus:ring-4 focus:ring-green-300 text-sm">
+                        Nova
+                    </a>
+                </div>
+            </div>
 
-    <div>
-        <label class="block font-medium">Tipo</label>
-        <select th:field="*{tipo}" class="w-full p-2 border rounded">
-            <option value="ENTRADA">Entrada</option>
-            <option value="SAIDA">Saída</option>
-        </select>
-    </div>
+            <!-- Usuário -->
+            <div>
+                <label for="usuario" class="block text-sm font-medium text-gray-700 mb-1">Usuário</label>
+                <select id="usuario" th:field="*{usuario}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
+                    <option value="" disabled selected>Selecione um usuário</option>
+                    <option th:each="usuario : ${usuarios}"
+                            th:value="${usuario.id}"
+                            th:text="${usuario.nome}">Usuário</option>
+                </select>
+            </div>
+        </div>
 
-    <div>
-        <label class="block font-medium">Competência</label>
-        <select th:field="*{competencia.id}" class="w-full p-2 border rounded">
-            <option th:each="c : ${competencias}" th:value="${c.id}" th:text="${c.mes} + '/' + ${c.ano}">03/2024</option>
-        </select>
-    </div>
+        <!-- Valor -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Valor</label>
+            <input type="number" step="0.01" th:field="*{valor}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200" required />
+        </div>
 
-    <button type="submit" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">Salvar</button>
-    <a th:href="@{/lancamentostf/empresa/{id}(id=${empresa.id})}" class="ml-4 text-blue-600 hover:underline">Cancelar</a>
-</form>
+        <!-- Tipo -->
+        <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
+            <select th:field="*{tipo}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
+                <option value="ENTRADA" class="bg-green-50">Entrada</option>
+                <option value="SAIDA" class="bg-red-50">Saída</option>
+            </select>
+        </div>
+
+        <!-- Data Ocorrência -->
+        <div>
+            <label for="data_ocorrencia" class="block text-sm font-medium text-gray-700 mb-1">Data Ocorrência</label>
+            <input type="date" id="data_ocorrencia" th:field="*{dataOcorrencia}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200" />
+        </div>
+
+        <!-- Competência Referida -->
+        <div class="md:col-span-2">
+            <label class="block text-sm font-medium text-gray-700 mb-1">Competência Referida</label>
+            <select th:field="*{competenciaReferida.id}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
+                <option th:each="c : ${competencias}"
+                        th:value="${c.id}"
+                        th:text="${c.mes} + '/' + ${c.ano}">
+                </option>
+            </select>
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-center gap-6 pt-6">
+            <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-full hover:bg-green-700 focus:ring-4 focus:ring-green-300 transition duration-300 transform hover:scale-105">
+                Salvar
+            </button>
+            <a th:href="@{/lancamentostf/competencia/{id}/{competenciaId}(id=${empresa.id}, competenciaId=${competencia.id})}"
+               class="text-blue-600 hover:underline py-2 text-sm">
+                Cancelar
+            </a>
+        </div>
+    </form>
+</div>
 </body>
 </html>

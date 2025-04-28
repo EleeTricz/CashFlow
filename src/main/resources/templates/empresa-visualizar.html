@@ -4,47 +4,63 @@
     <meta charset="UTF-8">
     <title th:text="'Empresa: ' + ${empresa.nome}">Visualizar Empresa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Definindo a paleta de verdes */
+        :root {
+            --green-1: #00b37e;  /* Verde vibrante */
+            --green-2: #00875f;  /* Verde médio */
+            --green-3: #2e8b57;  /* Verde mais escuro */
+            --gray-1: #f4f4f5;  /* Cinza suave */
+            --gray-2: #d1d5db;  /* Cinza mais escuro */
+        }
+    </style>
 </head>
-<body class="bg-gray-100 text-gray-900">
-<div class="container mx-auto p-6">
-    <h1 class="text-3xl font-bold mb-6">Empresa: <span th:text="${empresa.nome}"></span></h1>
+<body class="bg-gray-50 text-gray-900">
 
-    <div class="mb-6">
-        <p><strong>ID:</strong> <span th:text="${empresa.id}"></span></p>
-        <p><strong>Responsável:</strong> <span th:text="${empresa.usuario.nome}"></span></p>
+<div class="container mx-auto p-8">
+    <!-- Header -->
+    <header class="flex justify-between items-center mb-8">
+        <h1 class="text-4xl font-extrabold text-gray-800">Empresa: <span th:text="${empresa.nome}"></span></h1>
+    </header>
+
+    <!-- Informações da Empresa -->
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+        <div class="mb-6">
+            <p><strong>ID:</strong> <span th:text="${empresa.id}"></span></p>
+            <p><strong>Responsável:</strong> <span th:text="${empresa.usuario.nome}"></span></p>
+        </div>
     </div>
 
     <!-- Formulário para nova competência -->
-    <div class="mb-8 bg-white rounded shadow p-4">
-        <h2 class="text-xl font-semibold mb-2">Cadastrar Nova Competência</h2>
-        <form th:action="@{/competenciastf/nova}" method="post" class="space-y-4">
+    <div class="mb-8 bg-white rounded-lg shadow-md p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-4">Cadastrar Nova Competência</h2>
+        <form th:action="@{/competenciastf/nova}" method="post" class="space-y-6">
             <input type="hidden" name="empresaId" th:value="${empresa.id}"/>
 
             <div>
-                <label for="mes" class="block font-medium">Mês:</label>
+                <label for="mes" class="block font-medium text-gray-700">Mês:</label>
                 <input type="number" id="mes" name="mes" placeholder="04"
-                       class="w-full p-2 border rounded" required min="1" max="12">
+                       class="w-full p-3 border rounded-md focus:ring-2 focus:ring-green-500 transition duration-300"
+                       required min="1" max="12">
             </div>
 
             <div>
-                <label for="ano" class="block font-medium">Ano:</label>
+                <label for="ano" class="block font-medium text-gray-700">Ano:</label>
                 <input type="number" id="ano" name="ano" placeholder="2025"
-                       class="w-full p-2 border rounded" required min="1900" max="2100">
+                       class="w-full p-3 border rounded-md focus:ring-2 focus:ring-green-500 transition duration-300"
+                       required min="1900" max="2100">
             </div>
 
-            <button type="submit"
-                    class="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded">
+            <button type="submit" class="bg-green-500 hover:bg-green-600 text-white py-3 px-6 rounded-lg shadow-md transition duration-300 transform hover:scale-105">
                 Criar Competência
             </button>
         </form>
     </div>
 
     <!-- Saldo da Empresa -->
-    <div class="mb-8 bg-white rounded-lg shadow-xl p-6">
-        <h2 class="text-xl font-semibold mb-2 text-gray-800">Saldo Atual da Empresa</h2>
-
-        <!-- Saldo total em destaque -->
-        <p class="text-3xl font-extrabold text-green-600 tracking-tight"
+    <div class="bg-white rounded-lg shadow-xl p-6 mb-8">
+        <h2 class="text-2xl font-semibold mb-4 text-gray-800">Saldo Atual da Empresa</h2>
+        <p class="text-4xl font-extrabold text-green-600 tracking-tight"
            th:text="'R$ ' + ${#numbers.formatDecimal(saldoTotal, 1, 'COMMA', 2, 'POINT')}">R$ 0,00</p>
 
         <!-- Ver Lançamentos -->
@@ -56,30 +72,25 @@
         </div>
     </div>
 
-
-
-
     <!-- Competências -->
-    <div class="mt-4">
-        <h2 class="text-2xl font-bold mb-2">Competências</h2>
+    <div class="mt-6 bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-2xl font-semibold text-gray-800 mb-6">Competências</h2>
 
-        <table class="w-full table-auto bg-white rounded shadow">
-            <thead class="bg-gray-200">
+        <table class="w-full table-auto bg-white rounded-md shadow">
+            <thead class="bg-gray-100">
             <tr>
-                <th class="text-left p-2">Competência</th>
-                <th class="text-left p-2">Saldo</th>
-                <th class="text-left p-2">Ações</th>
+                <th class="text-left p-4 text-gray-600">Competência</th>
+                <th class="text-left p-4 text-gray-600">Saldo</th>
+                <th class="text-left p-4 text-gray-600">Ações</th>
             </tr>
             </thead>
             <tbody>
             <tr th:each="comp : ${competencias}">
-                <td class="p-2" th:text="|${comp.mes}/${comp.ano}|">03/2024</td>
-                <td class="p-2 text-blue-700 font-semibold"
+                <td class="p-4 text-gray-800" th:text="|${comp.mes}/${comp.ano}|">03/2024</td>
+                <td class="p-4 text-green-700 font-semibold"
                     th:text="|${#numbers.formatDecimal(saldoPorMes[comp.mes + '/' + comp.ano] ?: 0.00,
-                                      1, 'POINT', 2, 'COMMA')} R$|">
-                    R$ 0,00
-                </td>
-                <td class="p-2">
+                                      1, 'POINT', 2, 'COMMA')} R$|">R$ 0,00</td>
+                <td class="p-4">
                     <a th:href="@{/lancamentostf/competencia/{empresaId}/{competenciaId}(empresaId=${empresa.id}, competenciaId=${comp.id})}"
                        class="text-blue-600 hover:underline">Ver Lançamentos</a>
                 </td>
@@ -88,9 +99,11 @@
         </table>
     </div>
 
-    <div class="mt-6">
-        <a href="/empresastf/todas" class="text-blue-600 underline">← Voltar para lista de empresas</a>
+    <!-- Voltar para a lista de empresas -->
+    <div class="mt-6 text-center">
+        <a href="/empresastf/todas" class="text-blue-600 hover:text-blue-700 underline">← Voltar para lista de empresas</a>
     </div>
 </div>
+
 </body>
 </html>
