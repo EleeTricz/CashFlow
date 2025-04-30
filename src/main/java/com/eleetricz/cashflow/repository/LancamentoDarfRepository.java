@@ -14,4 +14,11 @@ public interface LancamentoDarfRepository extends JpaRepository<LancamentoDarf, 
             LocalDate dataArrecadacao,
             String totalTotal
     );
+    boolean existsByEmpresaAndCompetenciaAndDataArrecadacaoAndTotalTotalAndNumeroDocumento(
+            Empresa empresa,
+            Competencia competencia,
+            LocalDate dataArrecadacao,
+            String totalTotal,
+            String numeroDocumento
+    );
 }

@@ -154,8 +154,8 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
                                     BigDecimal valor,
                                     LocalDate dataOcorrencia)
     {
-        boolean exists = lancamentoRepo.existsByEmpresaAndCompetenciaAndDescricaoAndValorAndDataOcorrenciaAndTipo(
-                empresa, competencia, descricao, valor, dataOcorrencia, TipoLancamento.SAIDA
+        boolean exists = lancamentoRepo.existsByEmpresaAndCompetenciaAndCompetenciaReferidaAndDescricaoAndValorAndDataOcorrenciaAndTipo(
+                empresa, competencia, competenciaReferida,descricao, valor, dataOcorrencia, TipoLancamento.SAIDA
         );
         if (!exists) {
             lancamentoRepo.save(
