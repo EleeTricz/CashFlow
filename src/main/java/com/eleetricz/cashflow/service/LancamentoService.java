@@ -14,4 +14,5 @@ public interface LancamentoService {
     List<Lancamento> listarPorCompetencia(Empresa empresa, Competencia competencia);
     BigDecimal calcularSaldoPorEmpresa(Empresa empresa);
     Map<String, BigDecimal> calcularSaldoPorCompetencia(Empresa empresa);
+    public List<Lancamento> buscarPorEmpresaOrdenadoPorData(Long empresaId, boolean asc);
 }

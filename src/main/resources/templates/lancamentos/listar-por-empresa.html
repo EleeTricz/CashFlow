@@ -23,11 +23,12 @@
         </p>
     </div>
 
-    <!-- Botão de novo lançamento -->
-    <a th:href="@{/lancamentostf/novo/{empresaId}(empresaId=${empresa.id})}"
+    <!-- exportar Excel -->
+    <a th:href="@{/lancamentostf/empresa/{empresaId}/exportar-excel(empresaId=${empresa.id})}"
        class="inline-block bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-3 rounded-lg shadow-md hover:bg-gradient-to-l hover:from-green-600 hover:to-green-700 focus:ring-4 focus:ring-green-200 transition duration-200 mb-6">
-        Novo Lançamento
+        Exportar para Excel
     </a>
+
 
     <!-- Tabela de lançamentos -->
     <table class="w-full mt-8 bg-white shadow-lg rounded-lg overflow-hidden">
@@ -40,7 +41,16 @@
             <th class="p-3 text-left text-sm text-gray-600">Tipo</th>
             <th class="p-3 text-left text-sm text-gray-600">Valor</th>
             <th class="p-3 text-left text-sm text-gray-600">Competência</th>
-            <th class="p-3 text-left text-sm text-gray-600">Data Ocorrência</th> <!-- Novo cabeçalho para Data Ocorrência -->
+            <th class="p-3 text-left text-sm text-gray-600">
+                Data Ocorrência
+                <a th:href="@{'/lancamentostf/empresa/' + ${empresa.id} + '?sort=dataAsc'}"
+                   title="Ordem Crescente"
+                   class="ml-2 text-green-700 hover:text-green-900">↑</a>
+                <a th:href="@{'/lancamentostf/empresa/' + ${empresa.id} + '?sort=dataDesc'}"
+                   title="Ordem Decrescente"
+                   class="ml-1 text-red-700 hover:text-red-900">↓</a>
+            </th>
+
         </tr>
         </thead>
         <tbody>
@@ -54,8 +64,9 @@
             <td class="p-3 text-sm text-gray-800"
                 th:text="${ l.competenciaReferida != null
                        ? l.competenciaReferida.mes + '/' + l.competenciaReferida.ano
-                       : '-' }">
-                <!-- fallback '-' se for null -->
+                       : '-' }"
+            >
+                Competencia
             </td>
             <td class="p-3 text-sm text-gray-800"
                 th:text="${l.dataOcorrencia != null

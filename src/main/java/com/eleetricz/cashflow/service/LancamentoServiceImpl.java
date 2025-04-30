@@ -6,6 +6,7 @@ import com.eleetricz.cashflow.entity.Lancamento;
 import com.eleetricz.cashflow.entity.TipoLancamento;
 import com.eleetricz.cashflow.repository.LancamentoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -62,6 +63,12 @@ public class LancamentoServiceImpl implements LancamentoService{
         }
 
         return saldoPorCompetencia;
+    }
+
+    @Override
+    public List<Lancamento> buscarPorEmpresaOrdenadoPorData(Long empresaId, boolean asc) {
+        Sort sort = Sort.by(asc ? Sort.Direction.ASC : Sort.Direction.DESC, "dataOcorrencia");
+        return lancamentoRepository.findByEmpresaId(empresaId, sort);
     }
 
 }

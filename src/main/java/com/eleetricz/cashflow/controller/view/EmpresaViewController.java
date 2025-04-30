@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -58,6 +59,12 @@ public class EmpresaViewController {
     public String visualizarEmpresa(@PathVariable Long id, Model model) {
         Empresa empresa = empresaService.buscarPorId(id);
         List<Competencia> competencias = competenciaService.listarPorEmpresa(empresa);
+
+        // Ordenar por ano e depois por mês
+        competencias.sort(Comparator
+                .comparing(Competencia::getAno)
+                .thenComparing(Competencia::getMes));
+
         BigDecimal saldoTotal = lancamentoService.calcularSaldoPorEmpresa(empresa);
         Map<String, BigDecimal> saldoPorMes = lancamentoService.calcularSaldoPorCompetencia(empresa);
 
@@ -67,6 +74,7 @@ public class EmpresaViewController {
         model.addAttribute("saldoPorMes", saldoPorMes);
         return "empresa-visualizar";
     }
+
 
     @PostMapping
     public String salvar(@ModelAttribute Empresa empresa) {

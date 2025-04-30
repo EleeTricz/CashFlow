@@ -107,6 +107,7 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
         String desc = original.trim().toUpperCase();
 
         // Mapeamento das descrições específicas
+        if (desc.contains("ENCARGOS CP DESCONTADA SEGURADO")) return "Encargos INSS";
         if (desc.contains("CP DESCONTADA SEGURADO")) return "INSS";
         if (desc.contains("GPS")) return "INSS";
         if (desc.contains("DAS")) return "DAS";

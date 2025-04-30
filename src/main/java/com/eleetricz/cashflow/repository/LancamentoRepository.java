@@ -1,6 +1,7 @@
 package com.eleetricz.cashflow.repository;
 
 import com.eleetricz.cashflow.entity.*;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.math.BigDecimal;
@@ -35,4 +36,6 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
             Competencia competenciaReferida,
             Descricao descricao
     );
+
+    List<Lancamento> findByEmpresaId(Long empresaId, Sort sort);
 }
