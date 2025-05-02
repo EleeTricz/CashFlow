@@ -3,6 +3,7 @@ package com.eleetricz.cashflow.service;
 import com.eleetricz.cashflow.entity.Competencia;
 import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.entity.Lancamento;
+import com.eleetricz.cashflow.entity.TipoLancamento;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -14,5 +15,7 @@ public interface LancamentoService {
     List<Lancamento> listarPorCompetencia(Empresa empresa, Competencia competencia);
     BigDecimal calcularSaldoPorEmpresa(Empresa empresa);
     Map<String, BigDecimal> calcularSaldoPorCompetencia(Empresa empresa);
-    public List<Lancamento> buscarPorEmpresaOrdenadoPorData(Long empresaId, boolean asc);
+    List<Lancamento> buscarPorEmpresaOrdenadoPorData(Long empresaId, boolean asc);
+    Map<String, BigDecimal> calcularSaldoAcumuladoPorCompetencia(Empresa empresa);
+    BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano);
 }

@@ -2,6 +2,7 @@ package com.eleetricz.cashflow.controller.view;
 
 import com.eleetricz.cashflow.entity.Competencia;
 import com.eleetricz.cashflow.entity.Empresa;
+import com.eleetricz.cashflow.entity.TipoLancamento;
 import com.eleetricz.cashflow.entity.Usuario;
 import com.eleetricz.cashflow.service.CompetenciaService;
 import com.eleetricz.cashflow.service.EmpresaService;
@@ -12,6 +13,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
+import java.time.Year;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -68,10 +70,22 @@ public class EmpresaViewController {
         BigDecimal saldoTotal = lancamentoService.calcularSaldoPorEmpresa(empresa);
         Map<String, BigDecimal> saldoPorMes = lancamentoService.calcularSaldoPorCompetencia(empresa);
 
+        Map<String, BigDecimal> saldoAcumulado = lancamentoService.calcularSaldoAcumuladoPorCompetencia(empresa);
+
+        int anoAtual = Year.now().getValue();
+        BigDecimal totalEntradasAno = lancamentoService.somarPorTipoEAno(empresa, TipoLancamento.ENTRADA, anoAtual);
+        BigDecimal totalSaidasAno = lancamentoService.somarPorTipoEAno(empresa, TipoLancamento.SAIDA, anoAtual);
+
+
         model.addAttribute("empresa", empresa);
         model.addAttribute("competencias", competencias);
         model.addAttribute("saldoTotal", saldoTotal);
         model.addAttribute("saldoPorMes", saldoPorMes);
+        model.addAttribute("saldoAcumulado", saldoAcumulado);
+        model.addAttribute("totalEntradasAno", totalEntradasAno);
+        model.addAttribute("totalSaidasAno", totalSaidasAno);
+        model.addAttribute("anoAtual", anoAtual);
+
         return "empresa-visualizar";
     }
 

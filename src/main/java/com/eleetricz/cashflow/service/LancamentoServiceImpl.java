@@ -10,9 +10,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 public class LancamentoServiceImpl implements LancamentoService{
@@ -71,4 +69,46 @@ public class LancamentoServiceImpl implements LancamentoService{
         return lancamentoRepository.findByEmpresaId(empresaId, sort);
     }
 
+    @Override
+    public Map<String, BigDecimal> calcularSaldoAcumuladoPorCompetencia(Empresa empresa) {
+        List<Lancamento> lancamentos = lancamentoRepository.findByEmpresa(empresa);
+
+        if (lancamentos == null || lancamentos.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        Map<String, BigDecimal> saldoPorCompetencia = new TreeMap<>();
+
+        for (Lancamento lancamento : lancamentos) {
+            Competencia comp = lancamento.getCompetencia();
+            if (comp == null || comp.getAno() <= 0 || comp.getMes() <= 0) {
+                continue;
+            }
+
+            String chave = String.format("%04d-%02d", comp.getAno(), comp.getMes());
+
+            BigDecimal valor = lancamento.getValor() != null ? lancamento.getValor() : BigDecimal.ZERO;
+
+            if (TipoLancamento.SAIDA.equals(lancamento.getTipo())) {
+                valor = valor.negate();
+            }
+
+            saldoPorCompetencia.merge(chave, valor, BigDecimal::add);
+        }
+
+        Map<String, BigDecimal> saldoAcumulado = new LinkedHashMap<>();
+        BigDecimal acumulado = BigDecimal.ZERO;
+
+        for (Map.Entry<String, BigDecimal> entry : saldoPorCompetencia.entrySet()) {
+            acumulado = acumulado.add(entry.getValue());
+            saldoAcumulado.put(entry.getKey(), acumulado);
+        }
+
+        return saldoAcumulado;
+    }
+
+    @Override
+    public BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano) {
+        return lancamentoRepository.somarPorTipoEAno(empresa, tipo, ano);
+    }
 }

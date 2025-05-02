@@ -3,6 +3,8 @@ package com.eleetricz.cashflow.repository;
 import com.eleetricz.cashflow.entity.*;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -38,4 +40,11 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     );
 
     List<Lancamento> findByEmpresaId(Long empresaId, Sort sort);
+
+    @Query("SELECT COALESCE(SUM(l.valor), 0) FROM Lancamento l " +
+            "WHERE l.empresa = :empresa AND l.tipo = :tipo AND EXTRACT(YEAR FROM l.dataOcorrencia) = :ano")
+    BigDecimal somarPorTipoEAno(@Param("empresa") Empresa empresa,
+                                @Param("tipo") TipoLancamento tipo,
+                                @Param("ano") int ano);
+
 }

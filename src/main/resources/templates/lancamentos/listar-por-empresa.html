@@ -59,7 +59,12 @@
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoDebito}">Débito</td>
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoCredito}">Crédito</td>
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoHistorico}">Histórico</td>
-            <td class="p-3 text-sm" th:text="${l.tipo}" th:classappend="${l.tipo == 'ENTRADA' ? 'text-green-600' : 'text-red-600'}">Tipo</td>
+            <td class="p-3 text-sm"
+                th:text="${l.tipo}"
+                th:classappend="${l.tipo.name() == 'ENTRADA' ? ' text-green-600' : ' text-red-600'}">
+                Tipo
+            </td>
+
             <td class="p-3 text-sm text-gray-800" th:text="'R$ ' + ${#numbers.formatDecimal(l.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
             <td class="p-3 text-sm text-gray-800"
                 th:text="${ l.competenciaReferida != null

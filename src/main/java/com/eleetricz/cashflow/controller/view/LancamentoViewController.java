@@ -1,10 +1,9 @@
 package com.eleetricz.cashflow.controller.view;
 
 import com.eleetricz.cashflow.entity.*;
+import com.eleetricz.cashflow.relatorio.ExportadorLancamentosExcel;
 import com.eleetricz.cashflow.service.*;
 import jakarta.servlet.http.HttpServletResponse;
-import org.apache.poi.ss.usermodel.Row;
-import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,9 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -116,64 +113,40 @@ public class LancamentoViewController {
 
     @GetMapping("/empresa/{empresaId}/exportar-excel")
     public void exportarExcel(@PathVariable Long empresaId, HttpServletResponse response) throws IOException {
+        // Buscar empresa
         Empresa empresa = empresaService.buscarPorId(empresaId);
-        List<Lancamento> lancamentos = lancamentoService.listarPorEmpresa(empresa);
 
-        // Agrupar lançamentos por competência (objeto) para ordenar cronologicamente
-        Map<Competencia, List<Lancamento>> agrupado = lancamentos.stream()
+        // Buscar lançamentos e agrupar por competência
+        List<Lancamento> todosLancamentos = lancamentoService.listarPorEmpresa(empresa);
+        Map<String, BigDecimal> saldoAcumuladoPorCompetencia = lancamentoService.calcularSaldoAcumuladoPorCompetencia(empresa);
+
+        Map<Competencia, List<Lancamento>> lancamentosPorCompetencia = todosLancamentos.stream()
                 .collect(Collectors.groupingBy(Lancamento::getCompetencia));
 
-        // Ordenar competências da mais antiga para a mais recente
-        List<Map.Entry<Competencia, List<Lancamento>>> competenciasOrdenadas = agrupado.entrySet().stream()
-                .sorted(Comparator.comparing(e -> LocalDate.of(e.getKey().getAno(), e.getKey().getMes(), 1)))
-                .collect(Collectors.toList());
+        // Ordenar competências por data
+        List<Map.Entry<Competencia, List<Lancamento>>> competenciasOrdenadas = lancamentosPorCompetencia.entrySet().stream()
+                .sorted(Comparator.comparing(entry -> LocalDate.of(entry.getKey().getAno(), entry.getKey().getMes(), 1)))
+                .toList();
 
+        // Definir cabeçalho da resposta HTTP
         response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        response.setHeader("Content-Disposition", "attachment; filename=lancamentos_" + empresa.getNome() + ".xlsx");
 
-        Workbook workbook = new XSSFWorkbook();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        // Evita problemas com espaços ou caracteres inválidos no nome do arquivo
+        String nomeArquivo = "lancamentos_" + empresa.getNome().replaceAll("[^a-zA-Z0-9_-]", "_") + ".xlsx";
+        response.setHeader("Content-Disposition", "attachment; filename=" + nomeArquivo);
 
-        for (Map.Entry<Competencia, List<Lancamento>> entry : competenciasOrdenadas) {
-            Competencia competencia = entry.getKey();
-            String nomeAba = String.format("%02d-%d", competencia.getMes(), competencia.getAno()); // Aba sem "/"
-            Sheet sheet = workbook.createSheet(nomeAba);
-
-            Row header = sheet.createRow(0);
-            header.createCell(0).setCellValue("Descrição");
-            header.createCell(1).setCellValue("Competência Referida");
-            header.createCell(2).setCellValue("Débito");
-            header.createCell(3).setCellValue("Crédito");
-            header.createCell(4).setCellValue("Histórico");
-            header.createCell(5).setCellValue("Tipo");
-            header.createCell(6).setCellValue("Valor");
-            header.createCell(7).setCellValue("Data Ocorrência");
-
-            int rowNum = 1;
-            for (Lancamento lancamento : entry.getValue()) {
-                Row row = sheet.createRow(rowNum++);
-
-                row.createCell(0).setCellValue(lancamento.getDescricao().getNome());
-
-                String competenciaReferida = String.format("%02d/%d",
-                        lancamento.getCompetenciaReferida().getMes(),
-                        lancamento.getCompetenciaReferida().getAno());
-                row.createCell(1).setCellValue(competenciaReferida);
-
-                row.createCell(2).setCellValue(lancamento.getDescricao().getCodigoDebito());
-                row.createCell(3).setCellValue(lancamento.getDescricao().getCodigoCredito());
-                row.createCell(4).setCellValue(lancamento.getDescricao().getCodigoHistorico());
-                row.createCell(5).setCellValue(lancamento.getTipo().toString());
-                row.createCell(6).setCellValue(lancamento.getValor().setScale(2, RoundingMode.HALF_UP).doubleValue());
-
-                String dataFormatada = lancamento.getDataOcorrencia().format(formatter);
-                row.createCell(7).setCellValue(dataFormatada);
+        // Criar planilha Excel
+        try (Workbook workbook = new XSSFWorkbook()) {
+            ExportadorLancamentosExcel exportador = new ExportadorLancamentosExcel(workbook);
+            for (Map.Entry<Competencia, List<Lancamento>> entry : competenciasOrdenadas) {
+                exportador.criarAba(empresa, entry.getKey(), entry.getValue(), saldoAcumuladoPorCompetencia);
             }
+            workbook.write(response.getOutputStream());
         }
-
-        workbook.write(response.getOutputStream());
-        workbook.close();
     }
+
+
+
 
 
 
