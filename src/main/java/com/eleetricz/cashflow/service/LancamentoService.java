@@ -1,5 +1,6 @@
 package com.eleetricz.cashflow.service;
 
+import com.eleetricz.cashflow.dto.LancamentoRecorrenteDTO;
 import com.eleetricz.cashflow.entity.Competencia;
 import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.entity.Lancamento;
@@ -18,4 +19,5 @@ public interface LancamentoService {
     List<Lancamento> buscarPorEmpresaOrdenadoPorData(Long empresaId, boolean asc);
     Map<String, BigDecimal> calcularSaldoAcumuladoPorCompetencia(Empresa empresa);
     BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano);
+    void gerarLancamentosRecorrentes(LancamentoRecorrenteDTO dto);
 }

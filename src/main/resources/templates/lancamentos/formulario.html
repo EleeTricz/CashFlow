@@ -87,8 +87,12 @@
                 Salvar
             </button>
             <a th:href="@{/lancamentostf/competencia/{id}/{competenciaId}(id=${empresa.id}, competenciaId=${competencia.id})}"
-               class="text-blue-600 hover:underline py-2 text-sm">
+               class="bg-red-600 text-white px-8 py-3 rounded-full hover:bg-red-700 focus:ring-4 focus:ring-green-300 transition duration-300 transform hover:scale-105">
                 Cancelar
+            </a>
+            <a th:href="@{/lancamentostf/recorrentes(empresaId=${empresa.id})}"
+               class="bg-blue-600 text-white px-8 py-3 rounded-full hover:bg-blue-700 focus:ring-4 focus:ring-blue-300 transition duration-300 transform hover:scale-105">
+                Lançamento recorrente?
             </a>
         </div>
     </form>

@@ -1,20 +1,32 @@
 package com.eleetricz.cashflow.service;
 
-import com.eleetricz.cashflow.entity.Competencia;
-import com.eleetricz.cashflow.entity.Empresa;
-import com.eleetricz.cashflow.entity.Lancamento;
-import com.eleetricz.cashflow.entity.TipoLancamento;
-import com.eleetricz.cashflow.repository.LancamentoRepository;
+import com.eleetricz.cashflow.dto.LancamentoRecorrenteDTO;
+import com.eleetricz.cashflow.entity.*;
+import com.eleetricz.cashflow.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.YearMonth;
 import java.util.*;
 
 @Service
 public class LancamentoServiceImpl implements LancamentoService{
     @Autowired private LancamentoRepository lancamentoRepository;
+
+    @Autowired
+    private EmpresaRepository empresaRepository;
+
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    @Autowired
+    private CompetenciaRepository competenciaRepository;
+
+    @Autowired
+    private DescricaoRepository descricaoRepository;
 
     @Override
     public Lancamento salvar(Lancamento lancamento) {
@@ -110,5 +122,50 @@ public class LancamentoServiceImpl implements LancamentoService{
     @Override
     public BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano) {
         return lancamentoRepository.somarPorTipoEAno(empresa, tipo, ano);
+    }
+
+    @Override
+    public void gerarLancamentosRecorrentes(LancamentoRecorrenteDTO dto) {
+        YearMonth inicio = YearMonth.parse(dto.getCompetenciaInicio());
+        YearMonth fim = YearMonth.parse(dto.getCompetenciaFim());
+
+        Empresa empresa = empresaRepository.findById(dto.getEmpresaId())
+                .orElseThrow(() -> new RuntimeException("Empresa não encontrada"));
+
+        Usuario usuario = usuarioRepository.findById(dto.getUsuarioId())
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado"));
+
+        Descricao descricao = descricaoRepository.findById(dto.getDescricaoId())
+                .orElseThrow(() -> new RuntimeException("Descrição não encontrada"));
+
+        for (YearMonth ym = inicio; !ym.isAfter(fim); ym = ym.plusMonths(1)) {
+            final int mes = ym.getMonthValue();
+            final int ano = ym.getYear();
+
+            LocalDate dataOcorrencia = ym.atEndOfMonth();
+
+            Competencia competencia = competenciaRepository
+                    .findByMesAndAnoAndEmpresa(mes, ano, empresa)
+                    .orElseGet(() -> {
+                        Competencia nova = new Competencia();
+                        nova.setMes(mes);
+                        nova.setAno(ano);
+                        nova.setEmpresa(empresa);
+                        return competenciaRepository.save(nova);
+                    });
+
+
+            Lancamento lanc = new Lancamento();
+            lanc.setValor(dto.getValor());
+            lanc.setTipo(TipoLancamento.valueOf(dto.getTipo()));
+            lanc.setEmpresa(empresa);
+            lanc.setUsuario(usuario);
+            lanc.setDescricao(descricao);
+            lanc.setCompetencia(competencia);
+            lanc.setCompetenciaReferida(competencia);
+            lanc.setDataOcorrencia(dataOcorrencia);
+
+            lancamentoRepository.save(lanc);
+        }
     }
 }
