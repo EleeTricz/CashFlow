@@ -28,6 +28,7 @@
                         <option value="" disabled selected>Selecione uma descrição</option>
                         <option th:each="descricao : ${descricoes}"
                                 th:value="${descricao.id}"
+                                th:data-tipo="${descricao.tipo}"
                                 th:text="${descricao.nome}">Descrição</option>
                     </select>
                     <a th:href="@{/descricoestf/novo(empresaId=${empresa.id}, competenciaId=${competencia.id})}"
@@ -58,10 +59,13 @@
         <!-- Tipo -->
         <div>
             <label class="block text-sm font-medium text-gray-700 mb-1">Tipo</label>
-            <select th:field="*{tipo}" class="w-full p-3 border-2 border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 transition duration-200">
-                <option value="ENTRADA" class="bg-green-50">Entrada</option>
-                <option value="SAIDA" class="bg-red-50">Saída</option>
+            <select id="tipo" th:field="*{tipo}" disabled
+                    class="w-full p-3 border-2 border-gray-300 rounded-xl bg-gray-100 cursor-not-allowed">
+                <option value="ENTRADA">Entrada</option>
+                <option value="SAIDA">Saída</option>
             </select>
+            <!-- Campo oculto real que envia o valor -->
+            <input type="hidden" th:field="*{tipo}" id="tipoHidden" />
         </div>
 
         <!-- Data Ocorrência -->
@@ -98,4 +102,50 @@
     </form>
 </div>
 </body>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const descricaoSelect = document.getElementById("descricao");
+        const tipoSelect = document.getElementById("tipo");
+        const tipoHidden = document.getElementById("tipoHidden");
+        const dataOcorrenciaInput = document.getElementById("data_ocorrencia");
+        const competenciaInput = document.querySelector('input[name="competencia.id"]');
+        const competenciaReferidaSelect = document.querySelector('select[name="competenciaReferida.id"]');
+
+        function getLastDayOfMonth(year, month) {
+            return new Date(year, month, 0).toISOString().split('T')[0];
+        }
+
+        descricaoSelect.addEventListener("change", function () {
+            const selectedOption = descricaoSelect.options[descricaoSelect.selectedIndex];
+            const tipo = selectedOption.getAttribute("data-tipo");
+            const descricaoNome = selectedOption.textContent.trim(); // Sem .toLowerCase()
+
+            // Define tipo (ENTRADA ou SAIDA)
+            if (tipo) {
+                tipoSelect.value = tipo;
+                tipoHidden.value = tipo;
+            }
+
+            // Verifica nomes exatos conforme seu banco
+            if (descricaoNome === "Receita de Vendas" || descricaoNome === "COMPRAS A VISTA") {
+                const competenciaId = competenciaInput.value;
+                competenciaReferidaSelect.value = competenciaId;
+
+                const option = [...competenciaReferidaSelect.options].find(opt => opt.value === competenciaId);
+                if (option) {
+                    const [mesRaw, anoRaw] = option.textContent.split('/');
+                    const mes = parseInt(mesRaw.trim());
+                    const ano = parseInt(anoRaw.trim());
+                    const dataFinal = getLastDayOfMonth(ano, mes);
+                    dataOcorrenciaInput.value = dataFinal;
+                }
+            }
+        });
+    });
+</script>
+
+
+
+
 </html>

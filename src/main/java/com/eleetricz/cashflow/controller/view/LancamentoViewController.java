@@ -33,7 +33,7 @@ public class LancamentoViewController {
     @PostMapping("/salvar")
     public String salvar(@ModelAttribute Lancamento lancamento) {
         lancamentoService.salvar(lancamento);
-        return "redirect:/lancamentostf/empresa/" + lancamento.getEmpresa().getId();
+        return "redirect:/lancamentostf/novo/" + lancamento.getEmpresa().getId() + "/" + lancamento.getCompetencia().getId();
     }
 
 
