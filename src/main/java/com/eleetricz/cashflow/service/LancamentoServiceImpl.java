@@ -168,4 +168,11 @@ public class LancamentoServiceImpl implements LancamentoService{
             lancamentoRepository.save(lanc);
         }
     }
+
+    @Override
+    public void excluirLancamento(Long id) {
+        Lancamento lancamento = lancamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
+        lancamentoRepository.delete(lancamento);
+    }
 }

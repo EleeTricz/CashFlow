@@ -51,6 +51,7 @@
             <th class="p-3 text-left text-sm text-gray-600">Valor</th>
             <th class="p-3 text-left text-sm text-gray-600">Competência</th>
             <th class="p-3 text-left text-sm text-gray-600">Data Ocorrência</th>
+            <th class="p-3 text-left text-sm text-gray-600">Ações</th>
         </tr>
         </thead>
         <tbody>
@@ -76,6 +77,23 @@
                                T(java.time.format.DateTimeFormatter)
                                  .ofPattern('dd/MM/yyyy'))
                            : ''}">01/01/2024</td>
+            <td class="p-3 text-sm text-gray-600">
+                <!-- Fazer botão de editar depois !!
+
+                <button class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700"
+                onclick="editarLançamento(1)">
+                Editar
+               </button>
+               -->
+                <a th:href="@{/lancamentostf/excluir/{id}/{empresaId}/{competenciaId}(
+                   id=${l.id},
+                   empresaId=${empresaId},
+                   competenciaId=${competenciaId})}"
+                   class="px-4 py-2 bg-red-500 text-white rounded hover:bg-red-700"
+                   onclick="return confirm('Tem certeza que deseja excluir este lançamento?')">
+                    Excluir
+                </a>
+            </td>
         </tr>
         </tbody>
     </table>

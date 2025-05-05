@@ -145,6 +145,31 @@ public class LancamentoViewController {
         }
     }
 
+    @GetMapping("/excluir/{id}/{empresaId}/{competenciaId}")
+    public String excluir(
+            @PathVariable Long id,
+            @PathVariable Long empresaId,
+            @PathVariable Long competenciaId,
+            Model model) {
+        try {
+            lancamentoService.excluirLancamento(id);
+            // redireciona incluindo empresaId e competenciaId
+            return "redirect:/lancamentostf/competencia/"
+                    + empresaId + "/" + competenciaId;
+        } catch (Exception e) {
+            model.addAttribute("erro", "Erro ao excluir lançamento: " + e.getMessage());
+            // recarrega a lista em caso de erro
+            Empresa empresa = empresaService.buscarPorId(empresaId);
+            Competencia competencia = competenciaService.buscarPorId(competenciaId);
+            List<Lancamento> lancamentos = lancamentoService
+                    .listarPorCompetencia(empresa, competencia);
+            model.addAttribute("lancamentos", lancamentos);
+            model.addAttribute("empresaId", empresaId);
+            model.addAttribute("competenciaId", competenciaId);
+            return "lancamentos/listar-por-competencia";
+        }
+    }
+
 
 
 

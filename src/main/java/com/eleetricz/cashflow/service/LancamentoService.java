@@ -20,4 +20,5 @@ public interface LancamentoService {
     Map<String, BigDecimal> calcularSaldoAcumuladoPorCompetencia(Empresa empresa);
     BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano);
     void gerarLancamentosRecorrentes(LancamentoRecorrenteDTO dto);
+    void excluirLancamento(Long id);
 }
