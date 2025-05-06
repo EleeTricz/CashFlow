@@ -84,11 +84,17 @@
             </div>
         </div>
 
-        <!-- Ver Lançamentos -->
-        <div class="mt-6">
+        <!-- Ver Lançamentos e Resumo -->
+        <div class="mt-6 flex flex-col sm:flex-row gap-4">
             <a th:href="@{/lancamentostf/empresa/{empresaId}(empresaId=${empresa.id})}"
-               class="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 px-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300">
+               class="flex-1 text-center bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-3 px-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300">
                 Ver Todos os Lançamentos
+            </a>
+
+            <a th:href="@{'/lancamentostf/resumo/empresa/' + ${empresa.id} + '/ano/' + ${anoAtual}}"
+               class="flex-1 text-center bg-gradient-to-r from-purple-500 to-pink-600 hover:from-purple-600 hover:to-pink-700 text-white py-3 px-6 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300"
+               th:text="'Ver Resumo Receita x Compras (' + ${anoAtual} + ')'">
+                Ver Resumo Receita x Compras (Ano Atual)
             </a>
         </div>
     </div>

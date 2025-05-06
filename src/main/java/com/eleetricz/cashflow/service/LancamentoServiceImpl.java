@@ -1,6 +1,7 @@
 package com.eleetricz.cashflow.service;
 
 import com.eleetricz.cashflow.dto.LancamentoRecorrenteDTO;
+import com.eleetricz.cashflow.dto.ReceitaCompraResumoDTO;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -174,5 +175,16 @@ public class LancamentoServiceImpl implements LancamentoService{
         Lancamento lancamento = lancamentoRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
         lancamentoRepository.delete(lancamento);
+    }
+
+    @Override
+    public List<ReceitaCompraResumoDTO> getResumoReceitaCompraAnual(Long empresaId, int ano) {
+        List<ReceitaCompraResumoDTO> resumo = new ArrayList<>();
+        for (int mes = 1; mes <= 12; mes++) {
+            BigDecimal receitas = lancamentoRepository.totalPorDescricaoNomeMesAnoEmpresa("Receita de Vendas", mes, ano, empresaId);
+            BigDecimal compras = lancamentoRepository.totalPorDescricaoNomeMesAnoEmpresa("COMPRAS A VISTA", mes, ano, empresaId);
+            resumo.add(new ReceitaCompraResumoDTO(mes, receitas, compras));
+        }
+        return resumo;
     }
 }

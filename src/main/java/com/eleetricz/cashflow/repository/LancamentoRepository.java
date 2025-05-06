@@ -47,4 +47,16 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
                                 @Param("tipo") TipoLancamento tipo,
                                 @Param("ano") int ano);
 
+    @Query("SELECT COALESCE(SUM(l.valor), 0) FROM Lancamento l " +
+            "JOIN l.descricao d " +
+            "WHERE d.nome = :nome " +
+            "AND EXTRACT(MONTH FROM l.dataOcorrencia) = :mes " +
+            "AND EXTRACT(YEAR FROM l.dataOcorrencia) = :ano " +
+            "AND l.empresa.id = :empresaId")
+    BigDecimal totalPorDescricaoNomeMesAnoEmpresa(@Param("nome") String descricaoNome,
+                                                  @Param("mes") int mes,
+                                                  @Param("ano") int ano,
+                                                  @Param("empresaId") Long empresaId);
+
+
 }

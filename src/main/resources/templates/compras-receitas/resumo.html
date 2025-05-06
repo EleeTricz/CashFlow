@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Resumo Receita x Compras</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-50 p-8 font-sans">
+
+<!-- Cabeçalho -->
+<div class="container mx-auto px-6 mb-6">
+    <h1 class="text-3xl font-bold text-green-600" th:text="'Resumo de Receitas e Compras - ' + ${empresa.nome} + ' (' + ${ano} + ')'">
+        Resumo de Receitas e Compras
+    </h1>
+    <a th:href="@{/empresastf/{empresaId}(empresaId=${empresa.id})}"
+       class="text-blue-600 hover:text-blue-700 underline">
+        Voltar para a Empresa
+    </a>
+</div>
+
+<!-- Tabela de Resumo -->
+<div class="container mx-auto px-6">
+    <table class="table-auto w-full bg-white shadow-lg rounded-lg overflow-hidden">
+        <thead class="bg-green-200 text-gray-700">
+        <tr>
+            <th class="px-4 py-2 text-left text-sm">Mês</th>
+            <th class="px-4 py-2 text-left text-sm">Receitas</th>
+            <th class="px-4 py-2 text-left text-sm">Compras</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="linha : ${resumo}" class="border-t hover:bg-green-50">
+            <td class="px-4 py-2 text-sm text-gray-800"
+                th:text="${#dates.format(#dates.create(2023, linha.mes, 1), 'MMM')}">Jan</td>
+            <td class="px-4 py-2 text-sm text-gray-800"
+                th:text="'R$ ' + ${#numbers.formatDecimal(linha.receitas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+            <td class="px-4 py-2 text-sm text-gray-800"
+                th:text="'R$ ' + ${#numbers.formatDecimal(linha.compras, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+        </tr>
+        </tbody>
+        <tfoot class="bg-gray-100 font-semibold">
+        <tr>
+            <td class="px-4 py-2 text-sm text-gray-800">Total</td>
+            <td class="px-4 py-2 text-sm text-gray-800"
+                th:text="'R$ ' + ${#numbers.formatDecimal(totalReceitas, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+            <td class="px-4 py-2 text-sm text-gray-800"
+                th:text="'R$ ' + ${#numbers.formatDecimal(totalCompras, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+        </tr>
+        </tfoot>
+    </table>
+</div>
+
+</body>
+</html>

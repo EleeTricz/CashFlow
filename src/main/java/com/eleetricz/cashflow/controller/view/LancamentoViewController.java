@@ -1,5 +1,6 @@
 package com.eleetricz.cashflow.controller.view;
 
+import com.eleetricz.cashflow.dto.ReceitaCompraResumoDTO;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.relatorio.ExportadorLancamentosExcel;
 import com.eleetricz.cashflow.service.*;
@@ -170,6 +171,28 @@ public class LancamentoViewController {
         }
     }
 
+    @GetMapping("/resumo/empresa/{empresaId}/ano/{ano}")
+    public String getResumoReceitaCompra(@PathVariable Long empresaId,
+                                         @PathVariable int ano,
+                                         Model model) {
+        List<ReceitaCompraResumoDTO> resumo = lancamentoService.getResumoReceitaCompraAnual(empresaId, ano);
+
+        BigDecimal totalReceitas = resumo.stream()
+                .map(ReceitaCompraResumoDTO::getReceitas)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        BigDecimal totalCompras = resumo.stream()
+                .map(ReceitaCompraResumoDTO::getCompras)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        model.addAttribute("resumo", resumo);
+        model.addAttribute("ano", ano);
+        model.addAttribute("empresa", empresaService.buscarPorId(empresaId));
+        model.addAttribute("totalReceitas", totalReceitas);
+        model.addAttribute("totalCompras", totalCompras);
+
+        return "compras-receitas/resumo";
+    }
 
 
 
