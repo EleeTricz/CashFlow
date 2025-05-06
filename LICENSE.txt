@@ -1,0 +1,7 @@
+Copyright (c) 2025 Eriky Simões
+
+Este software é fornecido exclusivamente para fins de demonstração ou uso interno, conforme autorizado pelo autor.
+
+É proibida qualquer redistribuição, modificação, engenharia reversa, uso comercial ou qualquer outra forma de reutilização sem autorização expressa por escrito do autor.
+
+Todos os direitos reservados.
