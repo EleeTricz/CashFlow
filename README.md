@@ -1,8 +1,5 @@
  ---
 
-### 📄 **README.md – CashFlow**
-
-````markdown
 # 💸 CashFlow
 
 CashFlow é um sistema web de controle financeiro desenvolvido com Java Spring Boot, Thymeleaf e TailwindCSS. Ele permite o registro de entradas e saídas de caixa por empresa e competência, com geração automática de códigos contábeis baseados em descrições padronizadas.
@@ -31,7 +28,7 @@ CashFlow é um sistema web de controle financeiro desenvolvido com Java Spring B
    ```bash
    git clone https://github.com/seuusuario/cashflow.git
    cd cashflow
-````
+   ````
 
 2. Configure o banco de dados PostgreSQL no arquivo `application.properties`.
 
