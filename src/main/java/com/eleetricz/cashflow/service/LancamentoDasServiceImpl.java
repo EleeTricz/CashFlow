@@ -54,7 +54,7 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
                 salvarSeNaoExistir(empresa, competencia, competenciaReferida, dasDesc, sistema, principal, dataOcorrencia);
                 salvarSeNaoExistir(empresa, competencia, competenciaReferida, encDasDesc, sistema, encargos, dataOcorrencia);
             } else {
-                salvarSeNaoExistir(empresa, competencia, competencia, dasDesc, sistema, total, dataOcorrencia);
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, dasDesc, sistema, total, dataOcorrencia);
             }
         }
     }
