@@ -47,7 +47,7 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
             BigDecimal juros = new BigDecimal(rec.getJuros());
             BigDecimal total = new BigDecimal(rec.getTotal());
             BigDecimal encargos = Optional.ofNullable(rec.getEncargosDas())
-                    .map(BigDecimal::new)
+                    .map(val -> total.subtract(principal))
                     .orElse(multa.add(juros));
 
             if (encargos.compareTo(BigDecimal.ZERO) > 0) {
