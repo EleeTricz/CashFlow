@@ -4,6 +4,7 @@ import com.eleetricz.cashflow.dto.LancamentoRecorrenteDTO;
 import com.eleetricz.cashflow.dto.ReceitaCompraResumoDTO;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -14,20 +15,13 @@ import java.time.YearMonth;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class LancamentoServiceImpl implements LancamentoService{
-    @Autowired private LancamentoRepository lancamentoRepository;
-
-    @Autowired
-    private EmpresaRepository empresaRepository;
-
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
-    @Autowired
-    private CompetenciaRepository competenciaRepository;
-
-    @Autowired
-    private DescricaoRepository descricaoRepository;
+    private final LancamentoRepository lancamentoRepository;
+    private final EmpresaRepository empresaRepository;
+    private final UsuarioRepository usuarioRepository;
+    private final CompetenciaRepository competenciaRepository;
+    private final DescricaoRepository descricaoRepository;
 
     @Override
     public Lancamento salvar(Lancamento lancamento) {

@@ -2,14 +2,16 @@ package com.eleetricz.cashflow.service;
 
 import com.eleetricz.cashflow.entity.Usuario;
 import com.eleetricz.cashflow.repository.UsuarioRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UsuarioServiceImpl implements UsuarioService{
-    @Autowired private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
     public List<Usuario> listarTodos() {

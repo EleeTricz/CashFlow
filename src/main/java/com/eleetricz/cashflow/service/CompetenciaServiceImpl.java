@@ -3,14 +3,16 @@ package com.eleetricz.cashflow.service;
 import com.eleetricz.cashflow.entity.Competencia;
 import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.repository.CompetenciaRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class CompetenciaServiceImpl implements CompetenciaService{
-    @Autowired private CompetenciaRepository competenciaRepository;
+    private final CompetenciaRepository competenciaRepository;
 
     @Override
     public Competencia salvar(Competencia competencia) {
