@@ -8,4 +8,5 @@ import java.util.Optional;
 public interface DescricaoRepository extends JpaRepository<Descricao, Long> {
     boolean existsByNome(String nome);
     Optional<Descricao> findByNome(String nome);
+    Optional<Descricao> findByNomeIgnoreCase(String nome);
 }
