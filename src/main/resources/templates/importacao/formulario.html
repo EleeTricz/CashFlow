@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <title>Importar Planilha Excel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="p-8 bg-gray-50">
+
+<h1 class="text-3xl font-semibold text-center text-green-600 mb-8">Importar Planilha Excel</h1>
+
+<form th:action="@{/importacaotf/excel}" method="post" enctype="multipart/form-data"
+      class="space-y-6 max-w-3xl mx-auto bg-white p-6 rounded-lg shadow-lg">
+
+  <!-- Mensagens de sucesso -->
+  <div th:if="${mensagemSucesso}"
+       class="flex items-center bg-green-100 text-green-800 border border-green-300 p-4 rounded-md text-center">
+    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M5 13l4 4L19 7"></path>
+    </svg>
+    <span th:text="${mensagemSucesso}"></span>
+  </div>
+
+  <!-- Mensagens de erro -->
+  <div th:if="${mensagemErro}"
+       class="flex items-center bg-red-100 text-red-800 border border-red-300 p-4 rounded-md text-center">
+    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path stroke-linecap="round" stroke-linejoin="round"
+            d="M6 18L18 6M6 6l12 12"></path>
+    </svg>
+    <span th:text="${mensagemErro}"></span>
+  </div>
+
+  <!-- Empresa -->
+  <div>
+    <label for="empresaId" class="block text-lg font-medium text-gray-700">Empresa</label>
+    <div class="relative">
+      <select name="empresaId" id="empresaId" required
+              class="w-full p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500">
+        <option value="" disabled selected>Selecione uma empresa</option>
+        <option th:each="empresa : ${empresas}"
+                th:value="${empresa.id}"
+                th:text="${empresa.nome}"></option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Arquivo Excel -->
+  <div>
+    <label for="file" class="block text-lg font-medium text-gray-700">Arquivo Excel</label>
+    <div class="flex items-center space-x-3">
+      <input type="file" name="file" id="file" accept=".xlsx,.xls" required
+             class="flex-1 p-3 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500 bg-white">
+
+    </div>
+  </div>
+
+  <!-- Botões de ação -->
+  <div class="flex justify-between">
+    <!-- Botão Cancelar -->
+    <a th:href="@{/empresastf/todas}"
+       class="flex items-center bg-gray-200 text-gray-700 px-6 py-3 rounded-md hover:bg-gray-300 transition duration-300">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M15 19l-7-7 7-7"></path>
+      </svg>
+      Cancelar
+    </a>
+
+    <!-- Botão Importar -->
+    <button type="submit"
+            class="flex items-center bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition duration-300">
+      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+           viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M4 4v16h16V4H4zm4 8l4 4 4-4"></path>
+      </svg>
+      Importar
+    </button>
+  </div>
+</form>
+
+</body>
+</html>

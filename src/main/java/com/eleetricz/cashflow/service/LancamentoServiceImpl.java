@@ -175,7 +175,7 @@ public class LancamentoServiceImpl implements LancamentoService{
     public List<ReceitaCompraResumoDTO> getResumoReceitaCompraAnual(Long empresaId, int ano) {
         List<ReceitaCompraResumoDTO> resumo = new ArrayList<>();
         for (int mes = 1; mes <= 12; mes++) {
-            BigDecimal receitas = lancamentoRepository.totalPorDescricaoNomeMesAnoEmpresa("Receita de Vendas", mes, ano, empresaId);
+            BigDecimal receitas = lancamentoRepository.totalPorDescricaoNomeMesAnoEmpresa("RECEITAS DE VENDAS", mes, ano, empresaId);
             BigDecimal compras = lancamentoRepository.totalPorDescricaoNomeMesAnoEmpresa("COMPRAS A VISTA", mes, ano, empresaId);
             resumo.add(new ReceitaCompraResumoDTO(mes, receitas, compras));
         }

@@ -24,10 +24,20 @@
     </header>
 
     <!-- Informações da Empresa -->
-    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
+    <div class="bg-white shadow-lg rounded-lg p-6 mb-8 flex justify-between">
         <div class="mb-6">
             <p><strong>ID:</strong> <span th:text="${empresa.id}"></span></p>
             <p><strong>Responsável:</strong> <span th:text="${empresa.usuario.nome}"></span></p>
+        </div>
+        <div>
+            <a th:href="@{'/importacaotf/' + ${empresa.id}}"
+               class="inline-flex items-center bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                </svg>
+                Importar Planilha
+            </a>
         </div>
     </div>
 

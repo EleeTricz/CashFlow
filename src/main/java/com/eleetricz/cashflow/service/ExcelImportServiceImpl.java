@@ -1,10 +1,8 @@
 package com.eleetricz.cashflow.service;
 
 import com.eleetricz.cashflow.entity.*;
-import com.eleetricz.cashflow.repository.CompetenciaRepository;
-import com.eleetricz.cashflow.repository.DescricaoRepository;
-import com.eleetricz.cashflow.repository.EmpresaRepository;
-import com.eleetricz.cashflow.repository.LancamentoRepository;
+import com.eleetricz.cashflow.repository.*;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.apache.poi.ss.usermodel.*;
 import org.springframework.stereotype.Service;
@@ -24,8 +22,10 @@ public class ExcelImportServiceImpl implements ExcelImportService{
     private final CompetenciaRepository competenciaRepository;
     private final DescricaoRepository descricaoRepository;
     private final LancamentoRepository lancamentoRepository;
+    private final UsuarioRepository usuarioRepository;
 
     @Override
+    @Transactional
     public void importarPlanilhaDoExcel(MultipartFile file, Long empresaId) throws Exception {
         Empresa empresa = empresaRepository.findById(empresaId)
                 .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada"));
@@ -37,6 +37,7 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                 // Lê célula A4 com a competência principal
                 Row rowComp = sheet.getRow(3);
                 if (rowComp == null || rowComp.getCell(0) == null) continue;
+
 
                 String competenciaStr = getCellValueAsString(rowComp.getCell(0)).trim();
                 if (!competenciaStr.matches("\\d{2}/\\d{4}")) continue;
@@ -61,8 +62,15 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                     Row row = sheet.getRow(rowIndex);
                     if (row == null) continue;
 
-                    String descricaoNome = getCellValueAsString(row.getCell(1)).trim();
-                    if (descricaoNome.isBlank()) continue;
+                    String descricaoNomeOriginal = getCellValueAsString(row.getCell(1)).trim();
+                    if (descricaoNomeOriginal.isBlank()) continue;
+
+                    // Mudança pra Padronização de GPS para INSS
+                    String descricaoNome = switch (descricaoNomeOriginal.toUpperCase()) {
+                        case "GPS" -> "INSS";
+                        case "ENCARGOS GPS" -> "ENCARGOS INSS";
+                        default -> descricaoNomeOriginal;
+                    };
 
                     // Busca Descricao ignorando case
                     Descricao descricao = descricaoRepository.findByNomeIgnoreCase(descricaoNome)
@@ -89,17 +97,30 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                                     return competenciaRepository.save(c);
                                 });
                     }
+                    // Para casos onde a CompetenciaReferida vem em branco
+                    if (competenciaReferida == null) {
+                        competenciaReferida = competenciaPrincipal;
+                    }
 
-                    // Lê data de ocorrência (coluna D)
-                    LocalDate dataOcorrencia = null;
+                    // Lê data de ocorrência (coluna D), ou define último dia da competência principal
+                    LocalDate dataOcorrencia;
                     try {
                         String dataStr = getCellValueAsString(row.getCell(3)).trim();
                         if (!dataStr.isBlank()) {
                             dataOcorrencia = LocalDate.parse(dataStr, dateFormatter);
+                        } else {
+                            // Usa último dia do mês da competência principal
+                            int lastDay = LocalDate.of(competenciaPrincipal.getAno(), competenciaPrincipal.getMes(), 1)
+                                    .lengthOfMonth();
+                            dataOcorrencia = LocalDate.of(competenciaPrincipal.getAno(), competenciaPrincipal.getMes(), lastDay);
                         }
                     } catch (Exception e) {
-                        System.out.println("Data inválida na linha " + (rowIndex + 1));
+                        // Se a data estiver inválida, ainda assim aplica o último dia do mês da competência
+                        System.out.println("Data inválida na linha " + (rowIndex + 1) + " — usando último dia da competência principal.");
+                        int lastDay = LocalDate.of(competenciaPrincipal.getAno(), competenciaPrincipal.getMes(), 1).lengthOfMonth();
+                        dataOcorrencia = LocalDate.of(competenciaPrincipal.getAno(), competenciaPrincipal.getMes(), lastDay);
                     }
+
 
                     // Leitura dos valores nas colunas H (entrada) e I (saída)
                     BigDecimal valorEntrada = getCellValueAsBigDecimal(row.getCell(7));
@@ -118,7 +139,13 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                         continue; // pula linha se não houver valor
                     }
 
+                    // Usuario ADMIN
+                    Usuario usuario = usuarioRepository.getReferenceById(1L);
+
                     // Criação do lançamento
+                    salvarSeNaoExistir(empresa, competenciaPrincipal, competenciaReferida, descricao, usuario, valor, dataOcorrencia, tipo);
+
+                    /*
                     Lancamento lancamento = new Lancamento();
                     lancamento.setEmpresa(empresa);
                     lancamento.setCompetencia(competenciaPrincipal);
@@ -127,8 +154,11 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                     lancamento.setValor(valor);
                     lancamento.setTipo(tipo);
                     lancamento.setDataOcorrencia(dataOcorrencia);
+                    lancamento.setUsuario(usuario);
 
                     lancamentoRepository.save(lancamento);
+
+                     */
                 }
             }
         }
@@ -164,6 +194,25 @@ public class ExcelImportServiceImpl implements ExcelImportService{
             };
         } catch (Exception e) {
             return BigDecimal.ZERO;
+        }
+    }
+
+    private void salvarSeNaoExistir(Empresa empresa, Competencia competencia, Competencia competenciaReferida,
+                                    Descricao descricao, Usuario usuario, BigDecimal valor, LocalDate dataOcorrencia, TipoLancamento tipo) {
+        boolean exists = lancamentoRepository.existsByEmpresaAndCompetenciaAndCompetenciaReferidaAndDescricaoAndValorAndDataOcorrenciaAndTipo(
+                empresa, competencia, competenciaReferida, descricao, valor, dataOcorrencia, tipo );
+
+        if (!exists) {
+            lancamentoRepository.save(Lancamento.builder()
+                    .empresa(empresa)
+                    .competencia(competencia)
+                    .competenciaReferida(competenciaReferida)
+                    .descricao(descricao)
+                    .usuario(usuario)
+                    .valor(valor)
+                    .dataOcorrencia(dataOcorrencia)
+                    .tipo(tipo)
+                    .build());
         }
     }
 
