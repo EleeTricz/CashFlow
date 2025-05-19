@@ -23,7 +23,7 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
     @Transactional
     public void importarTodos() {
         Descricao dasDesc = getDescricaoByName("DAS");
-        Descricao encDasDesc = getDescricaoByName("Encargos DAS");
+        Descricao encDasDesc = getDescricaoByName("ENCARGOS DAS");
         Usuario sistema = getUsuarioByName("admin");
 
         Map<Long, Empresa> empresaCache = new HashMap<>();
