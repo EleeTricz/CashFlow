@@ -21,7 +21,7 @@ public class ExcelImportViewController {
     private final ExcelImportService excelImportService;
     private final EmpresaService empresaService;
 
-    @GetMapping
+    @GetMapping("/excel")
     public String mostrarFormularioImportacao(Model model){
         List<Empresa> empresas = empresaService.listarTodas();
         model.addAttribute("empresas", empresas);
@@ -43,7 +43,7 @@ public class ExcelImportViewController {
         return "redirect:/importacaotf/" + empresaId;
     }
 
-    @GetMapping("/{empresaId}")
+    @GetMapping("excel/{empresaId}")
     public String mostrarFormularioImportacaoComEmpresa(@PathVariable Long empresaId, Model model){
         List<Empresa> empresas = empresaService.listarTodas();
         model.addAttribute("empresas", empresas);

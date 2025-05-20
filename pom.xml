@@ -12,7 +12,7 @@
 	<artifactId>cashflow</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>CashFlow</name>
-	<description>Sistema de caixa web para controle de transações financeiras de empresas</description>
+	<description>Sistema de caixa ‘web’ para controle de transações financeiras de empresas</description>
 	<url/>
 	<licenses>
 		<license/>
@@ -78,9 +78,15 @@
 		<dependency>
 			<groupId>org.apache.poi</groupId>
 			<artifactId>poi-ooxml</artifactId>
-			<version>5.2.5</version>
+			<version>5.4.0</version>
 		</dependency>
 
+		<!-- PDFBox para leitura de PDFs -->
+		<dependency>
+			<groupId>org.apache.pdfbox</groupId>
+			<artifactId>pdfbox</artifactId>
+			<version>2.0.30</version>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>CashFlow - Início</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 font-sans min-h-screen flex flex-col items-center justify-center">
+
+<!-- Logo fictícia -->
+<div class="mb-6">
+    <div class="flex items-center gap-2">
+        <div class="bg-green-600 text-white font-bold text-xl p-3 rounded-full">CF</div>
+        <span class="text-green-700 text-2xl font-semibold">CashFlow</span>
+    </div>
+</div>
+
+<!-- Título -->
+<h1 class="text-3xl font-bold text-green-800 mb-10">Bem-vindo ao sistema de controle financeiro</h1>
+
+<!-- Opções -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <a href="/importartf/todas" class="bg-white hover:bg-green-100 text-green-700 border border-green-300 p-6 rounded-2xl shadow-lg text-center w-64">
+        <div class="text-4xl mb-2">📥</div>
+        <div class="text-lg font-semibold">Importar Planilhas</div>
+    </a>
+
+    <a href="/empresastf/todas" class="bg-white hover:bg-green-100 text-green-700 border border-green-300 p-6 rounded-2xl shadow-lg text-center w-64">
+        <div class="text-4xl mb-2">🏢</div>
+        <div class="text-lg font-semibold">Gerenciar Empresas</div>
+    </a>
+</div>
+
+<!-- Rodapé opcional -->
+<footer class="mt-12 text-sm text-green-600">
+    Desenvolvido internamente por EleeTricz(Eriky Simões) • CashFlow &copy; 2025
+</footer>
+
+</body>
+</html>

@@ -22,8 +22,8 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
 
     @Transactional
     public void importarTodos() {
-        Descricao dasDesc = getDescricaoByName("DAS");
-        Descricao encDasDesc = getDescricaoByName("ENCARGOS DAS");
+        Descricao dasDesc = getDescricaoById(9L);
+        Descricao encDasDesc = getDescricaoById(10L);
         Usuario sistema = getUsuarioByName("admin");
 
         Map<Long, Empresa> empresaCache = new HashMap<>();
@@ -46,13 +46,22 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
             BigDecimal multa = new BigDecimal(rec.getMulta());
             BigDecimal juros = new BigDecimal(rec.getJuros());
             BigDecimal total = new BigDecimal(rec.getTotal());
-            BigDecimal encargos = Optional.ofNullable(rec.getEncargosDas())
-                    .map(val -> total.subtract(principal))
-                    .orElse(multa.add(juros));
+            BigDecimal encargosInformado = new BigDecimal(rec.getEncargosDas());
 
-            if (encargos.compareTo(BigDecimal.ZERO) > 0) {
+            // Calcula a soma real de multa + juros
+            BigDecimal encargosCalculado = multa.add(juros);
+
+            // Se houver diferença, usa o valor calculado
+            if (encargosInformado.compareTo(encargosCalculado) != 0) {
+                encargosInformado = encargosCalculado;
+            }
+
+            System.out.println("Encargos usados: " + encargosInformado);
+
+            // Lógica de lançamento
+            if (encargosInformado.compareTo(BigDecimal.ZERO) > 0) {
                 salvarSeNaoExistir(empresa, competencia, competenciaReferida, dasDesc, sistema, principal, dataOcorrencia);
-                salvarSeNaoExistir(empresa, competencia, competenciaReferida, encDasDesc, sistema, encargos, dataOcorrencia);
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, encDasDesc, sistema, encargosInformado, dataOcorrencia);
             } else {
                 salvarSeNaoExistir(empresa, competencia, competenciaReferida, dasDesc, sistema, total, dataOcorrencia);
             }
@@ -62,6 +71,11 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
     private Descricao getDescricaoByName(String nome) {
         return descRepo.findByNome(nome)
                 .orElseThrow(() -> new IllegalStateException("Descrição '" + nome + "' não encontrada"));
+    }
+
+    private Descricao getDescricaoById(Long id){
+        return descRepo.findById(id)
+                .orElseThrow(() -> new IllegalStateException("Descrição: '" + id + "' não encontrada"));
     }
 
     private Usuario getUsuarioByName(String nome) {
@@ -105,6 +119,16 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
                     nova.setEmpresa(empresa);
                     return compRepo.save(nova);
                 });
+    }
+
+    @Override
+    public LancamentoDas salvar(LancamentoDas lancamentoDas) {
+        return dasRepo.save(lancamentoDas);
+    }
+
+    @Override
+    public boolean registroJaExiste(Long empresaId, String competencia, String numeroDocumento) {
+        return dasRepo.existsByEmpresaId_IdAndCompetenciaAndNumeroDocumento(empresaId, competencia, numeroDocumento);
     }
 
 }
