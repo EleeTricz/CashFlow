@@ -40,7 +40,7 @@ public class ExcelImportViewController {
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("mensagemErro", "Erro: " + e.getClass().getSimpleName() + " - " + e.getMessage());
         }
-        return "redirect:/importacaotf/" + empresaId;
+        return "redirect:/importacaotf/excel/" + empresaId;
     }
 
     @GetMapping("excel/{empresaId}")

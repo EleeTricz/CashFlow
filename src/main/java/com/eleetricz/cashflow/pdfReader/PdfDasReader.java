@@ -54,10 +54,10 @@ public class PdfDasReader {
 
         Matcher m2 = PADRAO_TOTAIS.matcher(texto);
         if (m2.find()) {
-            dados.total = normalizarValor(m2.group(1));
-            dados.juros = normalizarValor(m2.group(2));
-            dados.multa = normalizarValor(m2.group(3));
-            dados.principal = normalizarValor(m2.group(4));
+            dados.total = normalizarValor(m2.group(4));
+            dados.juros = normalizarValor(m2.group(3));
+            dados.multa = normalizarValor(m2.group(2));
+            dados.principal = normalizarValor(m2.group(1));
         }
 
         String[] linhas = texto.split("\\r?\\n");
