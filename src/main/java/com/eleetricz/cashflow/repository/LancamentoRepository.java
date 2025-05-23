@@ -14,6 +14,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     List<Lancamento> findByEmpresa(Empresa empresa);
     List<Lancamento> findByCompetencia(Empresa empresa);
     List<Lancamento> findByCompetenciaAndEmpresa(Competencia competencia, Empresa empresa);
+    List<Lancamento> findByEmpresaIdAndCompetenciaId(Long empresaId, Long competenciaId);
     boolean existsByEmpresaAndCompetenciaAndCompetenciaReferidaAndDescricaoAndValorAndDataOcorrenciaAndTipo(
             Empresa empresa,
             Competencia competencia,
@@ -58,5 +59,12 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
                                                   @Param("ano") int ano,
                                                   @Param("empresaId") Long empresaId);
 
-
+    @Query("""
+    SELECT l FROM Lancamento l
+    WHERE l.empresa.id = :empresaId
+    AND (l.competencia.ano > :anoInicial OR (l.competencia.ano = :anoInicial AND l.competencia.mes >= :mesInicial))
+    AND (l.competencia.ano < :anoFinal OR (l.competencia.ano = :anoFinal AND l.competencia.mes <= :mesFinal))
+    ORDER BY l.dataOcorrencia ASC, l.id ASC
+""")
+    List<Lancamento> findByEmpresaAndCompetenciaIntervaloOrdenado(Long empresaId, int mesInicial, int anoInicial, int mesFinal, int anoFinal);
 }

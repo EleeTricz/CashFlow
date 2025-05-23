@@ -69,6 +69,7 @@ public class ExcelImportServiceImpl implements ExcelImportService{
                     String descricaoNome = switch (descricaoNomeOriginal.toUpperCase()) {
                         case "GPS" -> "INSS";
                         case "ENCARGOS GPS" -> "ENCARGOS INSS";
+                        case "GPS 13º" -> "INSS 13º";
                         default -> descricaoNomeOriginal;
                     };
 
