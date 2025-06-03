@@ -22,6 +22,7 @@ public interface LancamentoService {
     BigDecimal somarPorTipoEAno(Empresa empresa, TipoLancamento tipo, int ano);
     void gerarLancamentosRecorrentes(LancamentoRecorrenteDTO dto);
     void excluirLancamento(Long id);
-    public List<ReceitaCompraResumoDTO> getResumoReceitaCompraAnual(Long empresaId, int ano);
+    List<ReceitaCompraResumoDTO> getResumoReceitaCompraAnual(Long empresaId, int ano);
+    void deletarLancamentosPorEmpresa(Long empresaId);
 
 }

@@ -67,4 +67,6 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     ORDER BY l.dataOcorrencia ASC, l.id ASC
 """)
     List<Lancamento> findByEmpresaAndCompetenciaIntervaloOrdenado(Long empresaId, int mesInicial, int anoInicial, int mesFinal, int anoFinal);
+    void deleteByEmpresaId(Long empresaId);
+
 }

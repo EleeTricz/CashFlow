@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -180,5 +181,11 @@ public class LancamentoServiceImpl implements LancamentoService{
             resumo.add(new ReceitaCompraResumoDTO(mes, receitas, compras));
         }
         return resumo;
+    }
+
+    @Override
+    @Transactional
+    public void deletarLancamentosPorEmpresa(Long empresaId) {
+        lancamentoRepository.deleteByEmpresaId(empresaId);
     }
 }

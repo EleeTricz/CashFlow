@@ -11,6 +11,7 @@ import com.eleetricz.cashflow.service.UsuarioService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.math.BigDecimal;
 import java.time.Year;
@@ -58,9 +59,25 @@ public class EmpresaViewController {
     }
 
     @GetMapping("/{id}")
-    public String visualizarEmpresa(@PathVariable Long id, Model model) {
+    public String visualizarEmpresa(@PathVariable Long id,
+                                    @RequestParam(required = false) Integer ano,
+                                    @RequestParam(required = false) String busca,
+                                    Model model) {
         Empresa empresa = empresaService.buscarPorId(id);
         List<Competencia> competencias = competenciaService.listarPorEmpresa(empresa);
+
+        // Filtrar por ano
+        if (ano != null) {
+            competencias.removeIf(c -> c.getAno() != ano);
+        }
+
+        // Busca textual no mes/ano
+        if (busca != null && !busca.isBlank()) {
+            String buscaLower = busca.toLowerCase();
+            competencias.removeIf(c ->
+                    !(c.getMes() + "/" + c.getAno()).toLowerCase().contains(buscaLower));
+        }
+
 
         // Ordenar por ano e depois por mês
         competencias.sort(Comparator
@@ -85,6 +102,8 @@ public class EmpresaViewController {
         model.addAttribute("totalEntradasAno", totalEntradasAno);
         model.addAttribute("totalSaidasAno", totalSaidasAno);
         model.addAttribute("anoAtual", anoAtual);
+        model.addAttribute("anoSelecionado", ano);
+        model.addAttribute("busca", busca);
 
         return "empresa-visualizar";
     }
@@ -96,4 +115,11 @@ public class EmpresaViewController {
         return "redirect:/empresastf/todas";
     }
 
+
+    @PostMapping("/{id}/zerar-lancamentos")
+    public String zerarLancamentosEmpresa(@PathVariable Long id, RedirectAttributes ra) {
+        lancamentoService.deletarLancamentosPorEmpresa(id);
+        ra.addFlashAttribute("mensagemSucesso", "Lançamentos da empresa foram zerados.");
+        return "redirect:/empresastf/" + id ;
+    }
 }

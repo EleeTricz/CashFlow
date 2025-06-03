@@ -43,4 +43,8 @@ public class Lancamento {
     @Enumerated(EnumType.STRING)
     private TipoLancamento tipo;
 
+    @ManyToOne
+    private Parcela parcela;
+
+    private String observacao;
 }

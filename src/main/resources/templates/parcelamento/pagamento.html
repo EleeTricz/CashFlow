@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Pagamento de Parcela</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="bg-green-50 min-h-screen p-6">
+<div class="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6 border border-green-200">
+    <h1 class="text-3xl font-bold text-green-700 flex items-center gap-2">
+        <i data-lucide="credit-card" class="w-6 h-6 text-green-600"></i>
+        Pagamento da Parcela <span th:text="${parcela.numeroParcela}"></span>
+    </h1>
+
+    <form th:action="@{/parcelamentostf/pagar}" method="post" class="space-y-5" >
+        <input type="hidden" name="parcelaId" th:value="${parcela.id}" />
+
+        <div>
+            <label class="block text-green-800 font-medium mb-1" for="valorBase">Valor Base</label>
+            <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+                <i data-lucide="dollar-sign" class="w-5 h-5 text-green-500"></i>
+                <input id="valorBase" type="number" step="0.01" name="valorBase" th:value="${parcela.valorPrincipal}" required
+                       class="w-full bg-transparent outline-none text-green-800" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-green-800 font-medium mb-1" for="valorEncargos">Encargos (Juros + Multa)</label>
+            <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+                <i data-lucide="dollar-sign" class="w-5 h-5 text-green-500"></i>
+                <input id="valorEncargos" type="number" step="0.01" name="valorEncargos" required
+                       class="w-full bg-transparent outline-none text-green-800" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-green-800 font-medium mb-1" for="dataPagamento">Data Pagamento</label>
+            <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+                <i data-lucide="calendar" class="w-5 h-5 text-green-500"></i>
+                <input id="dataPagamento" type="date" name="dataPagamento" required
+                       class="w-full bg-transparent outline-none text-green-800" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-green-800 font-medium mb-1" for="competencia">Competência</label>
+            <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+                <i data-lucide="clock" class="w-5 h-5 text-green-500"></i>
+                <input id="competencia" type="text" name="competencia" placeholder="MM/AAAA" required
+                       class="w-full bg-transparent outline-none text-green-800" />
+            </div>
+        </div>
+
+        <div>
+            <label class="block text-green-800 font-medium mb-1" for="competenciaReferida">Competência Referida</label>
+            <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+                <i data-lucide="clock" class="w-5 h-5 text-green-500"></i>
+                <input id="competenciaReferida" type="text" name="competenciaReferida" placeholder="MM/AAAA" required
+                       class="w-full bg-transparent outline-none text-green-800" />
+            </div>
+        </div>
+
+        <!-- Botões Voltar e Confirmar Pagamento -->
+        <div class="flex justify-between items-center mt-8">
+
+            <a href="/parcelamentostf/todos"
+               class="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium transition-colors">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Voltar
+            </a>
+
+            <button type="submit"
+                    class="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-all shadow-sm">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                Confirmar Pagamento
+            </button>
+
+        </div>
+    </form>
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
+</body>
+</html>

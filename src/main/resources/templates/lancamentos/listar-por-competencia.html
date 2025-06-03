@@ -56,7 +56,10 @@
         </thead>
         <tbody>
         <tr th:each="l : ${lancamentos}" class="border-t hover:bg-green-50">
-            <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.nome}">Descrição</td>
+            <td class="p-3 text-sm text-gray-800">
+                <span th:text="${l.descricao.nome}">Descrição</span>
+                <span th:text="${l.observacao}">1/5</span>
+            </td>
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoDebito}">Débito</td>
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoCredito}">Crédito</td>
             <td class="p-3 text-sm text-gray-800" th:text="${l.descricao.codigoHistorico}">Histórico</td>
