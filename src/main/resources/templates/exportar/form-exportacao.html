@@ -7,17 +7,23 @@
 </head>
 <body class="bg-green-50 min-h-screen flex flex-col items-center justify-start py-10 px-4 font-sans">
 
-<h1 class="text-4xl font-bold text-green-800 mb-8 text-center">Exportar Lançamentos</h1>
+<!-- Título com ícone -->
+<div class="flex items-center space-x-3 mb-8">
+    <svg class="w-10 h-10 text-green-700" fill="none" stroke="currentColor" stroke-width="2"
+         viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
+    </svg>
+    <h1 class="text-4xl font-bold text-green-800 text-center">Exportar Lançamentos</h1>
+</div>
 
-
-<div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-10 border border-green-200">
+<div class="w-full max-w-2xl bg-white rounded-3xl shadow-lg p-10 border border-green-200">
     <form th:action="@{/exportacaotf/exportar}" method="get" class="space-y-8">
 
         <!-- Empresa -->
         <div>
-            <label for="empresaId" class="block text-lg font-medium text-green-800 mb-2">Empresa</label>
+            <label for="empresaId" class="block text-lg font-semibold text-green-800 mb-2">Empresa</label>
             <select name="empresaId" id="empresaId" required
-                    class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                    class="w-full p-3 border border-green-300 rounded-lg focus:ring-green-500 focus:border-green-500 bg-green-50">
                 <option value="" disabled selected>Selecione uma empresa</option>
                 <option th:each="empresa : ${empresas}"
                         th:value="${empresa.id}"
@@ -28,30 +34,31 @@
         <!-- Período -->
         <div class="grid grid-cols-2 gap-4">
             <div>
-                <label for="mesInicial" class="block text-lg font-medium text-green-800 mb-2">Mês Inicial</label>
+                <label for="mesInicial" class="block text-lg font-semibold text-green-800 mb-2">Mês Inicial</label>
                 <input type="number" name="mesInicial" id="mesInicial" min="1" max="12" required
-                       class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                       class="w-full p-3 border border-green-300 rounded-lg bg-green-50 focus:ring-green-500 focus:border-green-500 outline-none">
             </div>
             <div>
-                <label for="anoInicial" class="block text-lg font-medium text-green-800 mb-2">Ano Inicial</label>
+                <label for="anoInicial" class="block text-lg font-semibold text-green-800 mb-2">Ano Inicial</label>
                 <input type="number" name="anoInicial" id="anoInicial" min="2000" required
-                       class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                       class="w-full p-3 border border-green-300 rounded-lg bg-green-50 focus:ring-green-500 focus:border-green-500 outline-none">
             </div>
             <div>
-                <label for="mesFinal" class="block text-lg font-medium text-green-800 mb-2">Mês Final</label>
+                <label for="mesFinal" class="block text-lg font-semibold text-green-800 mb-2">Mês Final</label>
                 <input type="number" name="mesFinal" id="mesFinal" min="1" max="12" required
-                       class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                       class="w-full p-3 border border-green-300 rounded-lg bg-green-50 focus:ring-green-500 focus:border-green-500 outline-none">
             </div>
             <div>
-                <label for="anoFinal" class="block text-lg font-medium text-green-800 mb-2">Ano Final</label>
+                <label for="anoFinal" class="block text-lg font-semibold text-green-800 mb-2">Ano Final</label>
                 <input type="number" name="anoFinal" id="anoFinal" min="2000" required
-                       class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                       class="w-full p-3 border border-green-300 rounded-lg bg-green-50 focus:ring-green-500 focus:border-green-500 outline-none">
             </div>
         </div>
 
         <!-- Botões -->
         <div class="flex justify-between items-center pt-6">
-            <a href="/" class="flex items-center text-green-700 bg-white border border-green-500 px-6 py-3 rounded-md hover:bg-green-100 transition">
+            <a href="/"
+               class="flex items-center text-green-700 border border-green-500 bg-white px-5 py-3 rounded-lg hover:bg-green-100 transition shadow-sm">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
                      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
@@ -59,10 +66,10 @@
                 Voltar
             </a>
             <button type="submit"
-                    class="flex items-center bg-green-600 text-white px-6 py-3 rounded-md hover:bg-green-700 transition">
+                    class="flex items-center bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700 transition shadow-md">
                 <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
                      viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 4v16h16V4H4zm4 8l4 4 4-4"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4"></path>
                 </svg>
                 Exportar TXT
             </button>

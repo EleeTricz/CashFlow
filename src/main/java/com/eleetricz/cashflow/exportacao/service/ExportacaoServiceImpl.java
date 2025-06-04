@@ -1,10 +1,7 @@
 package com.eleetricz.cashflow.exportacao.service;
 
 import com.eleetricz.cashflow.entity.Lancamento;
-import com.eleetricz.cashflow.exportacao.strategy.ExportacaoDasStrategy;
-import com.eleetricz.cashflow.exportacao.strategy.ExportacaoINSSStrategy;
-import com.eleetricz.cashflow.exportacao.strategy.ExportacaoPadraoStrategy;
-import com.eleetricz.cashflow.exportacao.strategy.ExportacaoStrategy;
+import com.eleetricz.cashflow.exportacao.strategy.*;
 import com.eleetricz.cashflow.repository.LancamentoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,8 +10,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.text.DecimalFormat;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,8 +24,11 @@ public class ExportacaoServiceImpl implements ExportacaoService {
 
     private final Map<String, ExportacaoStrategy> estrategiasEspecificas = Map.of(
             "DAS", new ExportacaoDasStrategy(),
-            "ENCARGOS DAS", new ExportacaoDasStrategy(),
-            "INSS 13º", new ExportacaoINSSStrategy()
+            "ENCARGOS DAS", new ExportacaoEncargosDasStrategy(),
+            "INSS 13º", new ExportacaoINSSStrategy(),
+            "DAS PARCELAMENTO", new ExportacaoDasParcelamentoStrategy(),
+            "ENCARGOS DAS PARCELAMENTO", new ExportacaoEncargosDasParcelamentoStrategy(),
+            "DAE 10 PARCELAMENTO", new ExportacaoDae10ParcelamentoStrategy()
             // Adicione outras aqui conforme necessário
     );
 
