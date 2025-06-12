@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Novo Lançamento Esperado</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="bg-green-50 min-h-screen p-6">
+
+<div class="max-w-2xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6 border border-green-200">
+  <h1 class="text-3xl font-bold text-green-700 flex items-center gap-2">
+    <i data-lucide="calendar-plus" class="w-6 h-6 text-green-600"></i> Novo Lançamento Esperado
+  </h1>
+
+  <form th:action="@{/lancamentos-esperadostf/salvar}" th:object="${esperado}" method="post" class="space-y-5">
+
+    <!-- Empresa ID (hidden) -->
+    <input type="hidden" th:field="*{empresa.id}" />
+
+    <!-- Descrição -->
+    <div>
+      <label class="block text-green-800 font-medium mb-1">Descrição</label>
+      <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+        <i data-lucide="file-text" class="w-5 h-5 text-green-500"></i>
+        <select th:field="*{descricao.id}" class="w-full bg-transparent outline-none text-green-800">
+          <option value="" disabled selected>Selecione uma descrição</option>
+          <option th:each="desc : ${descricoes}" th:value="${desc.id}" th:text="${desc.nome}"></option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Frequência -->
+    <div>
+      <label class="block text-green-800 font-medium mb-1">Frequência</label>
+      <div class="flex items-center gap-2 border border-green-300 rounded-lg p-2 bg-green-50">
+        <i data-lucide="repeat" class="w-5 h-5 text-green-500"></i>
+        <select th:field="*{frequencia}" class="w-full bg-transparent outline-none text-green-800">
+          <option th:each="freq : ${frequencias}" th:value="${freq}" th:text="${freq}"></option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Botões -->
+    <div class="flex justify-between items-center mt-8">
+      <!-- Botão Voltar -->
+      <a th:href="@{'/lancamentos-esperadostf/empresa/' + ${esperado.empresa.id}}"
+         class="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium transition-colors">
+        <i data-lucide="arrow-left" class="w-5 h-5"></i>
+        Voltar
+      </a>
+
+      <!-- Botão Salvar -->
+      <button type="submit"
+              class="inline-flex items-center gap-2 bg-green-600 text-white px-5 py-2 rounded-lg hover:bg-green-700 transition-all shadow-sm">
+        <i data-lucide="save" class="w-5 h-5"></i>
+        Salvar
+      </button>
+    </div>
+
+  </form>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

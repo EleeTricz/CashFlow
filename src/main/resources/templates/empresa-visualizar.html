@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title th:text="'Empresa: ' + ${empresa.nome}">Visualizar Empresa</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
     <style>
         /* Definindo a paleta de verdes */
         :root {
@@ -77,6 +78,13 @@
                           d="M9 17v-6h6v6m2 4H7a2 2 0 01-2-2V5a2 2 0 012-2h5l2 2h5a2 2 0 012 2v12a2 2 0 01-2 2z" />
                 </svg>
                 Gerenciar Parcelamentos
+            </a>
+
+            <!-- Gerenciar Lançamentos Esperados -->
+            <a th:href="@{'/lancamentos-esperadostf/empresa/' + ${empresa.id}}"
+               class="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm shadow">
+                <i data-lucide="calendar" class="w-5 h-5"></i>
+                Gerenciar Lançamentos Esperados
             </a>
         </div>
     </div>
@@ -235,6 +243,9 @@
         <a href="/empresastf/todas" class="text-blue-600 hover:text-blue-700 underline">← Voltar para lista de empresas</a>
     </div>
 </div>
-
+<script>
+    lucide.createIcons();
+</script>
 </body>
+
 </html>

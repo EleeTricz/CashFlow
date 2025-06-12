@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Lançamentos Esperados</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+</head>
+<body class="bg-green-50 min-h-screen p-6">
+
+<div class="max-w-4xl mx-auto bg-white shadow-xl rounded-2xl p-6 space-y-6 border border-green-200">
+  <!-- Título e botão Novo -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-3xl font-bold text-green-700 flex items-center gap-2">
+      <i data-lucide="calendar" class="w-6 h-6 text-green-600"></i>
+      Lançamentos Esperados
+    </h1>
+    <a th:href="@{'/lancamentos-esperadostf/novo/' + ${empresaId}}"
+       class="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-all shadow-sm">
+      <i data-lucide="plus" class="w-5 h-5"></i>
+      Novo
+    </a>
+  </div>
+
+  <!-- Tabela -->
+  <div class="overflow-x-auto">
+    <table class="min-w-full table-auto border border-green-200 rounded-lg">
+      <thead class="bg-green-100 text-green-800">
+      <tr>
+        <th class="text-left p-3 font-semibold">Descrição</th>
+        <th class="text-left p-3 font-semibold">Frequência</th>
+        <th class="text-left p-3 font-semibold">Ações</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${esperados}" class="border-t hover:bg-green-50">
+        <td class="p-3 text-green-900" th:text="${item.descricao.nome}">-</td>
+        <td class="p-3 text-green-900" th:text="${item.frequencia}">-</td>
+        <td class="p-3">
+          <a th:href="@{'/lancamentos-esperadostf/excluir/' + ${item.id}}"
+             onclick="return confirm('Deseja excluir este lançamento esperado?')"
+             class="inline-flex items-center gap-1 text-red-600 hover:text-red-800 transition-colors">
+            <i data-lucide="trash-2" class="w-4 h-4"></i> Excluir
+          </a>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Link de Voltar -->
+  <div class="flex justify-start pt-4">
+    <a th:href="@{'/empresastf/' + ${empresaId}}"
+       class="inline-flex items-center gap-2 text-green-700 hover:text-green-900 font-medium transition-colors">
+      <i data-lucide="arrow-left" class="w-5 h-5"></i>
+      Voltar para empresas
+    </a>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+</script>
+</body>
+</html>

@@ -3,11 +3,15 @@ package com.eleetricz.cashflow.controller.view;
 import com.eleetricz.cashflow.dto.ReceitaCompraResumoDTO;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.relatorio.ExportadorLancamentosExcel;
+import com.eleetricz.cashflow.repository.CompetenciaRepository;
+import com.eleetricz.cashflow.repository.DescricaoRepository;
+import com.eleetricz.cashflow.repository.LancamentoRepository;
 import com.eleetricz.cashflow.service.*;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -29,6 +33,11 @@ public class LancamentoViewController {
     @Autowired private CompetenciaService competenciaService;
     @Autowired private DescricaoService descricaoService;
     @Autowired private UsuarioService usuarioService;
+    @Autowired private LancamentoRepository lancamentoRepository;
+    @Autowired private DescricaoRepository descricaoRepository;
+    @Autowired private CompetenciaRepository competenciaRepository;
+    @Autowired private AuditoriaService auditoriaService;
+
 
 
     @PostMapping("/salvar")
@@ -76,11 +85,15 @@ public class LancamentoViewController {
         List<Lancamento> lancamentos = lancamentoService.listarPorCompetencia(empresa, competencia);
         Map<String, BigDecimal> saldoPorMes = lancamentoService.calcularSaldoPorCompetencia(empresa);
 
+        String compStr = competencia.getMes() + "-" + competencia.getAno();
+
+        List<LancamentoEsperado> pendencias = auditoriaService.verificarPendencias(empresaId, compStr);
+
         model.addAttribute("empresa", empresa);
         model.addAttribute("competencia", competencia);
         model.addAttribute("lancamentos", lancamentos);
         model.addAttribute("saldo", saldoPorMes.get(competencia.getMes() + "/" + competencia.getAno()));
-
+        model.addAttribute("pendencias", pendencias);
         return "lancamentos/listar-por-competencia";
     }
 
@@ -193,10 +206,6 @@ public class LancamentoViewController {
 
         return "compras-receitas/resumo";
     }
-
-
-
-
 
 
 
