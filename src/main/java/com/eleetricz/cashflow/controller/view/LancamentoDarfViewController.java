@@ -1,11 +1,10 @@
 package com.eleetricz.cashflow.controller.view;
 
-import com.eleetricz.cashflow.dto.DasData;
+import com.eleetricz.cashflow.dto.DarfData;
 import com.eleetricz.cashflow.entity.Empresa;
-import com.eleetricz.cashflow.entity.LancamentoDas;
-import com.eleetricz.cashflow.pdfReader.PdfDasReader;
+import com.eleetricz.cashflow.pdfReader.PdfDarfReader;
 import com.eleetricz.cashflow.service.EmpresaService;
-import com.eleetricz.cashflow.service.LancamentoDasService;
+import com.eleetricz.cashflow.service.LancamentoDarfService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -16,51 +15,39 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
-import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Controller
 @RequestMapping("/importacaotf")
 @RequiredArgsConstructor
-public class LancamentoDasViewController {
+public class LancamentoDarfViewController {
     private final EmpresaService empresaService;
-    private final LancamentoDasService dasService;
-    private final PdfDasReader pdfDasReader;
+    private final LancamentoDarfService lancamentoDarfService;
+    private final PdfDarfReader pdfDarfReader;
 
-    private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-
-    @GetMapping("/das")
+    @GetMapping("darf")
     public String mostrarFormularioUpload(Model model) {
         List<Empresa> empresas = empresaService.listarTodas();
         model.addAttribute("empresas", empresas);
-        return "das/upload";
+        return "darf/upload";
     }
 
-    @PostMapping("/das/upload")
+    @PostMapping("/darf/upload")
     public String processarUpload(
             @RequestParam("empresaId") Long empresaId,
             @RequestParam("file") MultipartFile file,
             Model model
     ) {
         try {
-            File tempFile = File.createTempFile("das-", ".pdf");
+            File tempFile = File.createTempFile("tf-", ".pdf");
             file.transferTo(tempFile);
 
-            int inseridos = 0;
-            List<DasData> dadosExtraidos = pdfDasReader.extrairTodosDados(tempFile);
-
-            inseridos = dasService.importarDadosPdfDas(empresaId, dadosExtraidos);
-
-
+            List<DarfData> dadosExtraidos = pdfDarfReader.extrairTodosDados(tempFile);
+            int inseridos = lancamentoDarfService.importarDadosPdfDarf(empresaId, dadosExtraidos);
             Files.deleteIfExists(tempFile.toPath());
 
-            // ✅ Chamada automática da importação
-            dasService.importarTodos();
-
-
+            lancamentoDarfService.importarTodos();
             model.addAttribute("mensagem", "Upload concluído! Registros inseridos: " + inseridos);
         }catch (IllegalArgumentException e) {
             model.addAttribute("erro", e.getMessage());
@@ -69,6 +56,7 @@ public class LancamentoDasViewController {
         }
 
         model.addAttribute("empresas", empresaService.listarTodas());
-        return "das/upload";
+        return "darf/upload";
     }
+
 }

@@ -1,5 +1,6 @@
 package com.eleetricz.cashflow.service;
 
+import com.eleetricz.cashflow.dto.DasData;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
 import jakarta.transaction.Transactional;
@@ -8,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -19,6 +21,7 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
     private final CompetenciaRepository compRepo;
     private final EmpresaRepository empRepo;
     private final UsuarioRepository userRepo;
+    private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
     @Transactional
     public void importarTodos() {
@@ -55,8 +58,6 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
             if (encargosInformado.compareTo(encargosCalculado) != 0) {
                 encargosInformado = encargosCalculado;
             }
-
-            System.out.println("Encargos usados: " + encargosInformado);
 
             // Lógica de lançamento
             if (encargosInformado.compareTo(BigDecimal.ZERO) > 0) {
@@ -130,5 +131,37 @@ public class LancamentoDasServiceImpl implements LancamentoDasService {
     public boolean registroJaExiste(Long empresaId, String competencia, String numeroDocumento) {
         return dasRepo.existsByEmpresaId_IdAndCompetenciaAndNumeroDocumento(empresaId, competencia, numeroDocumento);
     }
+
+    @Transactional
+    @Override
+    public int importarDadosPdfDas(Long empresaId, List<DasData> dadosExtraidos) {
+        int inseridos = 0;
+
+        Empresa empresa = empRepo.findById(empresaId)
+                .orElseThrow(() -> new IllegalStateException("Empresa id=" + empresaId + " não existe"));
+
+        for (DasData data : dadosExtraidos) {
+            if (!registroJaExiste(empresaId, data.competencia, data.numeroDocumento)) {
+                LancamentoDas lanc = new LancamentoDas();
+                lanc.setEmpresaId(empresa);
+                lanc.setCompetencia(data.competencia);
+                lanc.setNumeroDocumento(data.numeroDocumento);
+                lanc.setDataVencimento(LocalDate.parse(data.dataVencimento, BR_DATE));
+                lanc.setDataArrecadacao(LocalDate.parse(data.dataArrecadacao, BR_DATE));
+                lanc.setPrincipal(data.principal);
+                lanc.setMulta(data.multa);
+                lanc.setJuros(data.juros);
+                lanc.setTotal(data.total);
+
+                BigDecimal encargos = new BigDecimal(data.juros).add(new BigDecimal(data.multa));
+                lanc.setEncargosDas(encargos.toString());
+
+                salvar(lanc);
+                inseridos++;
+            }
+        }
+        return inseridos;
+    }
+
 
 }

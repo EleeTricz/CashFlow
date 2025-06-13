@@ -43,6 +43,13 @@ public class PdfDasReader {
     }
 
     private Optional<DasData> extrairDadosDeTexto(String texto) {
+
+        Pattern padraoDas = Pattern.compile("\\bDAS\\b", Pattern.CASE_INSENSITIVE);
+        Matcher matcherDas = padraoDas.matcher(texto);
+        if (!matcherDas.find()) {
+            throw new IllegalArgumentException("Este arquivo não parece ser um DAS.");
+        }
+
         DasData dados = new DasData();
 
         Matcher m1 = PADRAO_DADOS_INICIAIS.matcher(texto);

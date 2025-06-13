@@ -5,5 +5,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface LancamentoDasRepository extends JpaRepository<LancamentoDas, Long> {
     boolean existsByEmpresaId_IdAndCompetenciaAndNumeroDocumento(Long empresaId, String competencia, String numeroDocumento);
+    void deleteByEmpresaId_Id(Long empresaId);
 
 }
