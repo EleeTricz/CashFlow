@@ -8,4 +8,5 @@ import java.util.List;
 
 public interface ItensDarfRepository extends JpaRepository<ItensDarf, Long> {
     List<ItensDarf> findByLancamentoDarf(LancamentoDarf darf);
+    void deleteByLancamentoDarf_Id(Long id);
 }

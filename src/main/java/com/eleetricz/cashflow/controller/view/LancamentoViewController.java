@@ -115,6 +115,11 @@ public class LancamentoViewController {
         lancamento.setEmpresa(empresa);
         lancamento.setCompetencia(competencia);
 
+        // Ordenar por ano e mês
+        competencias.sort(Comparator
+                .comparing(Competencia::getAno)
+                .thenComparing(Competencia::getMes));
+
         model.addAttribute("empresa", empresa);
         model.addAttribute("lancamento", lancamento);
         model.addAttribute("competencias", competencias);
@@ -198,11 +203,14 @@ public class LancamentoViewController {
                 .map(ReceitaCompraResumoDTO::getCompras)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
 
+        List<Integer> anosDisponiveis = lancamentoService.getAnosComLancamentos(empresaId);
+
         model.addAttribute("resumo", resumo);
         model.addAttribute("ano", ano);
         model.addAttribute("empresa", empresaService.buscarPorId(empresaId));
         model.addAttribute("totalReceitas", totalReceitas);
         model.addAttribute("totalCompras", totalCompras);
+        model.addAttribute("anosDisponiveis", anosDisponiveis);
 
         return "compras-receitas/resumo";
     }

@@ -188,4 +188,9 @@ public class LancamentoServiceImpl implements LancamentoService{
     public void deletarLancamentosPorEmpresa(Long empresaId) {
         lancamentoRepository.deleteByEmpresaId(empresaId);
     }
+
+    @Override
+    public List<Integer> getAnosComLancamentos(Long empresaId){
+      return lancamentoRepository.findAnosComLancamentos(empresaId);
+    }
 }

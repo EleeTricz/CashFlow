@@ -1,13 +1,15 @@
 package com.eleetricz.cashflow.controller.view;
 
-import com.eleetricz.cashflow.entity.Competencia;
-import com.eleetricz.cashflow.entity.Empresa;
-import com.eleetricz.cashflow.entity.TipoLancamento;
-import com.eleetricz.cashflow.entity.Usuario;
+import com.eleetricz.cashflow.entity.*;
+import com.eleetricz.cashflow.repository.ItensDarfRepository;
+import com.eleetricz.cashflow.repository.LancamentoDaeRepository;
+import com.eleetricz.cashflow.repository.LancamentoDarfRepository;
+import com.eleetricz.cashflow.repository.LancamentoDasRepository;
 import com.eleetricz.cashflow.service.CompetenciaService;
 import com.eleetricz.cashflow.service.EmpresaService;
 import com.eleetricz.cashflow.service.LancamentoService;
 import com.eleetricz.cashflow.service.UsuarioService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -20,19 +22,13 @@ import java.util.List;
 import java.util.Map;
 
 @Controller
+@RequiredArgsConstructor
 @RequestMapping("/empresastf")
 public class EmpresaViewController {
     final private EmpresaService empresaService;
     final private UsuarioService usuarioService;
     final private CompetenciaService competenciaService;
     final private LancamentoService lancamentoService;
-
-    public EmpresaViewController(EmpresaService empresaService, UsuarioService usuarioService, CompetenciaService competenciaService, LancamentoService lancamentoService) {
-        this.empresaService = empresaService;
-        this.usuarioService = usuarioService;
-        this.competenciaService = competenciaService;
-        this.lancamentoService = lancamentoService;
-    }
 
     @GetMapping("/usuario")
     public String listarPorUsuario(@RequestParam("usuarioId") Long usuarioId, Model model) {
@@ -45,8 +41,11 @@ public class EmpresaViewController {
 
     @GetMapping("/todas")
     public String listarTodas(Model model) {
-        List<Empresa> empresas = empresaService.listarTodas();
-        model.addAttribute("empresas", empresas);
+        List<Empresa> empresasOrdenadas = empresaService.listarTodas()
+                .stream()
+                .sorted(Comparator.comparing(Empresa::getNome, String.CASE_INSENSITIVE_ORDER))
+                .toList();
+        model.addAttribute("empresas", empresasOrdenadas);
         model.addAttribute("usuarios", usuarioService.listarTodos());
         return "painel";  // Nome da sua página Thymeleaf
     }
@@ -115,11 +114,12 @@ public class EmpresaViewController {
         return "redirect:/empresastf/todas";
     }
 
-
-    @PostMapping("/{id}/zerar-lancamentos")
-    public String zerarLancamentosEmpresa(@PathVariable Long id, RedirectAttributes ra) {
-        lancamentoService.deletarLancamentosPorEmpresa(id);
-        ra.addFlashAttribute("mensagemSucesso", "Lançamentos da empresa foram zerados.");
-        return "redirect:/empresastf/" + id ;
+    @PostMapping("/{empresaId}/zerar-lancamentos")
+    public String zerarLancamentosEmpresa(@PathVariable Long empresaId,
+                                          RedirectAttributes ra) {
+        empresaService.zerarLancamentos(empresaId);
+        ra.addFlashAttribute("mensagemSucesso",
+                "Lançamentos da empresa foram zerados.");
+        return "redirect:/empresastf/" + empresaId;
     }
 }

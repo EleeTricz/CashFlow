@@ -18,8 +18,17 @@ public class PdfDasReaderTest {
         List<DasData> resultados = reader.extrairTodosDados(arquivoPdf);
 
         assertFalse(resultados.isEmpty(), "A lista de dados1 extraídos não deve estar vazia");
-
         DasData dados1 = resultados.get(0);
+
+        System.out.println("Número Documento: " + dados1.numeroDocumento);
+        System.out.println("Período Apuração: " + dados1.competencia);
+        System.out.println("Data Vencimento: " + dados1.dataVencimento);
+        System.out.println("Data Arrecadação: " + dados1.dataArrecadacao);
+        System.out.println("Total Principal: " + dados1.principal);
+        System.out.println("Total Juros: " + dados1.juros);
+        System.out.println("Total Multa: " + dados1.multa);
+        System.out.println("Total Total: " + dados1.total);
+
         assertEquals("12/2019", dados1.competencia);
         assertEquals("20/01/2020", dados1.dataVencimento);
         assertEquals("07202000461290356", dados1.numeroDocumento);

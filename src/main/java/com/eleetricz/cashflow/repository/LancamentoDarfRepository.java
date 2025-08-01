@@ -21,4 +21,10 @@ public interface LancamentoDarfRepository extends JpaRepository<LancamentoDarf, 
             String totalTotal,
             String numeroDocumento
     );
+    boolean existsByEmpresaAndCompetenciaAndNumeroDocumento(Empresa empresa, String competencia, String numeroDocumento);
+
+    List<LancamentoDarf> findByEmpresaId(Long empresaId);
+
+
+
 }

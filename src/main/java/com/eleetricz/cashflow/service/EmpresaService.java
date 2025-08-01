@@ -10,4 +10,5 @@ public interface EmpresaService {
     List<Empresa> listarPorUsuario(Usuario usuario);
     List<Empresa> listarTodas();
     Empresa buscarPorId(Long id);
+    void zerarLancamentos(Long empresaId);
 }

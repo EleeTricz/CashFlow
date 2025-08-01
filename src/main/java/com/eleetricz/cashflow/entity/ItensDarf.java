@@ -12,17 +12,17 @@ import lombok.NoArgsConstructor;
 public class ItensDarf {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "darf_id")
-    LancamentoDarf lancamentoDarf;
+    private LancamentoDarf lancamentoDarf;
 
-    String codigo;
-    String descricao;
-    String principal;
-    String multa;
-    String juros;
-    String total;
+    private String codigo;
+    private String descricao;
+    private String principal;
+    private String multa;
+    private String juros;
+    private String total;
 
 }

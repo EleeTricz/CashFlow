@@ -14,27 +14,27 @@ import java.time.LocalDate;
 public class LancamentoDae {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @Column(name = "competencia_referida")
-    String competenciaReferida;
+    private String competenciaReferida;
 
     @Column(name = "competencia")
-    String competencia;
+    private String competencia;
 
     @Column(name = "data_vencimento")
-    LocalDate dataVencimento;
+    private LocalDate dataVencimento;
 
     @Column(name = "data_arrecadacao")
-    LocalDate dataArrecadacao;
+    private LocalDate dataArrecadacao;
 
-    String valor;
+    private String valor;
 
     @Column(name = "numero_documento_origem")
-    String numeroDocumentoOrigem;
+    private String numeroDocumentoOrigem;
 
     @ManyToOne
     @JoinColumn(name = "empresa_id")
-    Empresa empresa;
+    private Empresa empresa;
 
 }

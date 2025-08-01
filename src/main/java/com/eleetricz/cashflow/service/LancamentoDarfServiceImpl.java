@@ -1,5 +1,7 @@
 package com.eleetricz.cashflow.service;
 
+import com.eleetricz.cashflow.dto.DarfData;
+import com.eleetricz.cashflow.dto.DasData;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
 import jakarta.transaction.Transactional;
@@ -8,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 @Service
@@ -20,6 +23,8 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
     private final DescricaoRepository descricaoRepo;
     private final UsuarioRepository usuarioRepo;
     private final LancamentoRepository lancamentoRepo;
+    private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    private static final DateTimeFormatter COMP_DATE = DateTimeFormatter.ofPattern("MM/yyyy");
 
     @Transactional
     @Override
@@ -58,68 +63,76 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
 
             // para cada item da DARF, geramos lançamentos
             List<ItensDarf> itens = itensRepo.findByLancamentoDarf(darf);
+            BigDecimal totalINSS = BigDecimal.ZERO;
+            BigDecimal encargosINSS = BigDecimal.ZERO;
+
+            BigDecimal totalIR = BigDecimal.ZERO;
+            BigDecimal encargosIR = BigDecimal.ZERO;
+
+            BigDecimal totalMultaCLT = BigDecimal.ZERO;
+            BigDecimal encargosMultaCLT = BigDecimal.ZERO;
+
             for (ItensDarf item : itens) {
+                String descricaoItem = item.getDescricao().toUpperCase();
                 BigDecimal principal = parse(item.getPrincipal());
                 BigDecimal multa     = parse(item.getMulta());
                 BigDecimal juros     = parse(item.getJuros());
                 BigDecimal encargos  = multa.add(juros);
 
-                Descricao descPrinc = getOrCreateDescricao(item.getDescricao());
-                Descricao descEnc   = getOrCreateDescricao("Encargos " + item.getDescricao());
+                if (descricaoItem.contains("CONTR PREV DESCONTA SEGURADO") ||
+                        descricaoItem.contains("CP DESCONTADA SEGURADO")) {
 
-                if (principal.compareTo(BigDecimal.ZERO) > 0) {
-                    salvarSeNaoExistir(
-                            empresa,
-                            competencia,
-                            competenciaReferida,
-                            descPrinc,
-                            sistema,
-                            principal,
-                            dataOcorrencia
-                    );
+                    totalINSS = totalINSS.add(principal);
+                    encargosINSS = encargosINSS.add(encargos);
+
+                } else if (descricaoItem.contains("IRRF")) {
+                    totalIR = totalIR.add(principal);
+                    encargosIR = encargosIR.add(encargos);
+
+                } else if (descricaoItem.contains("MULTA DA CLT") || descricaoItem.contains("MULTA DA CLT") ) {
+                    totalMultaCLT = totalMultaCLT.add(principal);
+                    encargosMultaCLT = encargosMultaCLT.add(encargos);
                 }
 
-                if (encargos.compareTo(BigDecimal.ZERO) > 0) {
-                    salvarSeNaoExistir(
-                            empresa,
-                            competencia,
-                            competenciaReferida,
-                            descEnc,
-                            sistema,
-                            encargos,
-                            dataOcorrencia
-                    );
-                }
+
             }
+
+            // Salvar lançamentos de INSS
+            if (totalINSS.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descINSS = getOrCreateDescricao("INSS");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descINSS, sistema, totalINSS, dataOcorrencia);
+            }
+            if (encargosINSS.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descEncINSS = getOrCreateDescricao("ENCARGOS INSS");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descEncINSS, sistema, encargosINSS, dataOcorrencia);
+            }
+
+            // Salvar lançamentos de IR
+            if (totalIR.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descIR = getOrCreateDescricao("IRRF");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descIR, sistema, totalIR, dataOcorrencia);
+            }
+            if (encargosIR.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descEncIR = getOrCreateDescricao("ENCARGOS IRRF");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descEncIR, sistema, encargosIR, dataOcorrencia);
+            }
+
+            // Salvar lançamentos de Multa da CLT
+            if (totalMultaCLT.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descMultaCLT = getOrCreateDescricao("MULTA CLT");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descMultaCLT, sistema, totalIR, dataOcorrencia);
+            }
+            if (encargosMultaCLT.compareTo(BigDecimal.ZERO) > 0) {
+                Descricao descEncMultaCLT = getOrCreateDescricao("ENCARGOS MULTA CLT");
+                salvarSeNaoExistir(empresa, competencia, competenciaReferida, descEncMultaCLT, sistema, encargosIR, dataOcorrencia);
+            }
+
         }
     }
 
     private Descricao getOrCreateDescricao(String nome) {
-        // Mapeamento de descrições para padronizar os nomes
-        String descricao = mapearDescricao(nome);
-        return descricaoRepo.findByNome(descricao)
-                .orElseGet(() -> descricaoRepo.save(Descricao.builder().nome(descricao).build()));
-    }
-
-    private String mapearDescricao(String original) {
-        if (original == null) return "Outro";
-
-        String desc = original.trim().toUpperCase();
-
-        // Mapeamento das descrições específicas
-        if (desc.contains("ENCARGOS CP DESCONTADA SEGURADO")) return "ENCARGOS INSS";
-        if (desc.contains("CP DESCONTADA SEGURADO")) return "INSS";
-        if (desc.contains("GPS")) return "INSS";
-        if (desc.contains("DAS")) return "DAS";
-        if (desc.contains("FGTS")) return "FGTS";
-        if (desc.contains("IRRF") || desc.contains("IRPF")) return "IR";
-        if (desc.contains("DARF") && desc.contains("CSLL")) return "CSLL";
-        if (desc.contains("DARF") && desc.contains("COFINS")) return "COFINS";
-        if (desc.contains("DARF") && desc.contains("PIS")) return "PIS";
-        if (desc.contains("DARF") && desc.contains("IRPJ")) return "IRPJ";
-
-        // padrão geral (manter o original se nada bater)
-        return desc;
+        return descricaoRepo.findByNome(nome)
+                .orElseGet(() -> descricaoRepo.save(Descricao.builder().nome(nome).build()));
     }
 
     private Usuario getUsuarioByName(String nome) {
@@ -173,4 +186,55 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
         }
     }
 
+
+    public boolean registroJaExiste(Empresa empresa, String competencia, String numeroDocumento){
+        return darfRepo.existsByEmpresaAndCompetenciaAndNumeroDocumento(empresa, competencia, numeroDocumento);
+    }
+
+    public LancamentoDarf salvar(LancamentoDarf lancamentoDarf) {
+        return darfRepo.save(lancamentoDarf);
+    }
+
+    @Transactional
+    @Override
+    public int importarDadosPdfDarf(Long empresaId, List<DarfData> dadosExtraidos) {
+        int inseridos = 0;
+
+        // Busca empresa e usuário "sistema"
+        Empresa empresa = empresaRepo.findById(empresaId)
+                .orElseThrow(() -> new IllegalStateException("Empresa id=" + empresaId + " não existe"));
+
+        for (DarfData data : dadosExtraidos){
+
+            LocalDate dataApuracao = LocalDate.parse(data.getPeriodoApuracao(), BR_DATE);
+            String competencia = dataApuracao.format(COMP_DATE);
+
+            if(!registroJaExiste(empresa, competencia, data.getNumeroDocumento())){
+                LancamentoDarf lanc = new LancamentoDarf();
+                lanc.setEmpresa(empresa);
+                lanc.setCompetencia(competencia);
+                lanc.setDataArrecadacao(LocalDate.parse(data.getDataArrecadacao(), BR_DATE));
+                lanc.setDataVencimento(LocalDate.parse(data.getDataVencimento(), BR_DATE));
+                lanc.setTotalPrincipal(data.getTotalPrincipal());
+                lanc.setTotalMulta(data.getTotalMulta());
+                lanc.setTotalJuros(data.getTotalJuros());
+                lanc.setTotalTotal(data.getTotalTotal());
+                lanc.setNumeroDocumento(data.getNumeroDocumento());
+                lanc.setPeriodoApuracao(data.getPeriodoApuracao());
+
+                // Associar cada item ao lançamento
+                List<ItensDarf> itens = data.getItens();
+                for (ItensDarf item : itens) {
+                    item.setLancamentoDarf(lanc); // <- ESSA LINHA É ESSENCIAL
+                }
+                lanc.setItensDarf(itens);
+
+
+                salvar(lanc);
+                inseridos++;
+            }
+        }
+
+        return inseridos;
+    }
 }

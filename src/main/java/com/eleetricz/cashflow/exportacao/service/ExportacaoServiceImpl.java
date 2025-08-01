@@ -14,6 +14,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static java.util.Map.entry;
+
 @Service
 @RequiredArgsConstructor
 public class ExportacaoServiceImpl implements ExportacaoService {
@@ -22,20 +24,27 @@ public class ExportacaoServiceImpl implements ExportacaoService {
 
     private final ExportacaoStrategy estrategiaPadrao = new ExportacaoPadraoStrategy();
 
-    private final Map<String, ExportacaoStrategy> estrategiasEspecificas = Map.of(
-            "DAS", new ExportacaoDasStrategy(),
-            "ENCARGOS DAS", new ExportacaoEncargosDasStrategy(),
-            "INSS 13º", new ExportacaoINSSStrategy(),
-            "DAS PARCELAMENTO", new ExportacaoDasParcelamentoStrategy(),
-            "ENCARGOS DAS PARCELAMENTO", new ExportacaoEncargosDasParcelamentoStrategy(),
-            "DAE 10 PARCELAMENTO", new ExportacaoDae10ParcelamentoStrategy()
+    private final Map<String, ExportacaoStrategy> estrategiasEspecificas = Map.ofEntries(
+            entry("DAS", new ExportacaoDasStrategy()),
+            entry("ENCARGOS DAS", new ExportacaoEncargosDasStrategy()),
+            entry("INSS 13º", new ExportacaoINSSStrategy()),
+            entry("DAS PARCELAMENTO", new ExportacaoDasParcelamentoStrategy()),
+            entry("ENCARGOS DAS PARCELAMENTO", new ExportacaoEncargosDasParcelamentoStrategy()),
+            entry("DAE 10 PARCELAMENTO", new ExportacaoDae10ParcelamentoStrategy()),
+            entry("PREFEITURA", new ExportacaoPrefeituraStrategy()),
+            entry("MULTA CLT", new ExportacaoMultaCltStrategy()),
+            entry("DARF CSLL", new ExportacaoDarfCSLLStrategy()),
+            entry("DARF IRPJ", new ExportacaoDarfIRPJStrategy()),
+            entry("FERIAS", new ExportacaoFeriasStrategy()),
+            entry("RESCISAO", new ExportacaoRescisaoStrategy())
             // Adicione outras aqui conforme necessário
     );
 
     private final Set<String> descricoesIgnoradas = Set.of(
             "COMPRAS A VISTA",
             "RECEITAS DE VENDAS",
-            "CAIXA INICIAL"
+            "CAIXA INICIAL",
+            "SERVIÇOS"
             // Outras descrições que não devem gerar exportação
     );
 

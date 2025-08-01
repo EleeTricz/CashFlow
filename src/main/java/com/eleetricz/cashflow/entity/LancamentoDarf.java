@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "lancamento_darf")
@@ -14,34 +15,37 @@ import java.time.LocalDate;
 public class LancamentoDarf {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    Long id;
+    private Long id;
 
     @ManyToOne
-    Empresa empresa;
+    private Empresa empresa;
 
     @Column(name = "numero_documento")
-    String numeroDocumento;
+    private String numeroDocumento;
 
     @Column(name = "periodo_apuracao")
-    String periodoApuracao;
+    private String periodoApuracao;
 
     @Column(name = "data_vencimento")
-    LocalDate dataVencimento;
+    private LocalDate dataVencimento;
 
     @Column(name = "data_arrecadacao")
-    LocalDate dataArrecadacao;
+    private LocalDate dataArrecadacao;
 
     @Column(name = "total_principal")
-    String totalPrincipal;
+    private String totalPrincipal;
 
     @Column(name = "total_multa")
-    String totalMulta;
+    private String totalMulta;
 
     @Column(name = "total_juros")
-    String totalJuros;
+    private String totalJuros;
 
     @Column(name = "total_total")
-    String totalTotal;
+    private String totalTotal;
 
-    String competencia;
+    private String competencia;
+
+    @OneToMany(mappedBy = "lancamentoDarf", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ItensDarf> itensDarf;
 }

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Importar Entradas</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-50 min-h-screen flex flex-col items-center justify-start py-10 px-4 font-sans">
+
+<!-- Título -->
+<h1 class="text-4xl font-bold text-green-800 mb-8">Importar Entradas (Extrato .txt)</h1>
+
+<!-- Container do formulário -->
+<div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-10 border border-green-200">
+
+    <!-- Mensagem de sucesso -->
+    <div th:if="${mensagem != null and !mensagem.startsWith('Erro:')}"
+         class="mb-6 flex items-center bg-green-100 text-green-800 border border-green-300 p-4 rounded-md">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
+        </svg>
+        <span th:text="${mensagem}"></span>
+    </div>
+
+    <!-- Mensagem de erro -->
+    <div th:if="${mensagem != null and mensagem.startsWith('Erro:')}"
+         class="mb-6 flex items-center bg-red-100 text-red-800 border border-red-300 p-4 rounded-md">
+        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+        </svg>
+        <span th:text="${mensagem}"></span>
+    </div>
+
+    <form th:action="@{/importacaotf/entradas}" method="post" enctype="multipart/form-data" class="space-y-8">
+
+        <!-- Seleção da empresa -->
+        <div>
+            <label for="empresaId" class="block text-lg font-medium text-green-800 mb-2">Empresa</label>
+            <select name="empresaId" id="empresaId" required
+                    class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                <option value="" disabled selected>Selecione uma empresa</option>
+                <option th:each="empresa : ${empresas}"
+                        th:value="${empresa.id}"
+                        th:text="${empresa.nome}">Empresa</option>
+            </select>
+        </div>
+
+        <!-- Campo ano base -->
+        <div>
+            <label for="anoBase" class="block text-lg font-medium text-green-800 mb-2">Ano Base</label>
+            <input type="number" name="anoBase" id="anoBase" required
+                   class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500" />
+        </div>
+
+        <!-- Upload do arquivo -->
+        <div>
+            <label for="arquivo" class="block text-lg font-medium text-green-800 mb-2">Arquivo .txt</label>
+            <input type="file" name="arquivo" id="arquivo" accept=".txt" required
+                   class="block w-full p-3 text-base text-green-800 border border-green-300 rounded-lg cursor-pointer bg-white focus:outline-none focus:ring-green-500 focus:border-green-500" />
+        </div>
+
+        <!-- Botões -->
+        <div class="flex justify-between items-center pt-4">
+            <!-- Botão Cancelar -->
+            <a th:href="@{/importartf/todas}"
+               class="flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-md hover:bg-green-200 transition">
+                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
+                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Cancelar
+            </a>
+
+            <!-- Botão Enviar -->
+            <button type="submit"
+                    class="inline-flex justify-center px-6 py-3 border border-green-600 shadow-md text-base rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none">
+                Enviar TXT
+            </button>
+        </div>
+    </form>
+</div>
+
+</body>
+</html>

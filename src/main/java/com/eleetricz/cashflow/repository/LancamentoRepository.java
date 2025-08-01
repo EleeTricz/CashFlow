@@ -69,4 +69,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     List<Lancamento> findByEmpresaAndCompetenciaIntervaloOrdenado(Long empresaId, int mesInicial, int anoInicial, int mesFinal, int anoFinal);
     void deleteByEmpresaId(Long empresaId);
 
+    @Query("SELECT DISTINCT EXTRACT(YEAR FROM l.dataOcorrencia) FROM Lancamento l WHERE l.empresa.id = :empresaId ORDER BY 1 DESC")
+    List<Integer> findAnosComLancamentos(@Param("empresaId") Long empresaId);
+
 }
