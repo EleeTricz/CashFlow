@@ -31,9 +31,6 @@ public class PdfDarfReader {
                 stripper.setStartPage(i);
                 stripper.setEndPage(i);
                 String texto = stripper.getText(document);
-                System.out.println("-------------------INICIO DO TEXTO:----------------");
-                System.out.println(texto);
-                System.out.println("-------------------FIM DO TEXTO-------------------");
                 Optional<DarfData> dados = extrairDadosDeTexto(texto);
                 dados.ifPresent(resultados::add);
             }
