@@ -24,7 +24,7 @@ class PdfDarfReaderTest {
 
         assertFalse(dadosExtraidos.isEmpty(), "Nenhum dado foi extraído do PDF");
 
-        DarfData primeiro = dadosExtraidos.get(0);
+        DarfData primeiro = dadosExtraidos.get(5);
 
         System.out.println("Número Documento: " + primeiro.getNumeroDocumento());
         System.out.println("Período Apuração: " + primeiro.getPeriodoApuracao());

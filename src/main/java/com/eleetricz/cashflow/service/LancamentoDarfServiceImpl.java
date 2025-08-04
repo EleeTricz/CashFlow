@@ -79,6 +79,27 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
                 BigDecimal juros     = parse(item.getJuros());
                 BigDecimal encargos  = multa.add(juros);
 
+
+                if (descricaoItem.contains("13 SALÁRIO")) {
+                    // Soma principal e encargos separadamente
+                    BigDecimal valorPrincipal13 = principal;
+                    BigDecimal valorEncargos13 = encargos;
+
+                    if (valorPrincipal13.compareTo(BigDecimal.ZERO) > 0) {
+                        Descricao desc13 = getOrCreateDescricao("INSS 13º");
+                        salvarSeNaoExistir(empresa, competencia, competenciaReferida,
+                                desc13, sistema, valorPrincipal13, dataOcorrencia);
+                    }
+
+                    if (valorEncargos13.compareTo(BigDecimal.ZERO) > 0) {
+                        Descricao descEnc13 = getOrCreateDescricao("ENCARGOS INSS 13º");
+                        salvarSeNaoExistir(empresa, competencia, competenciaReferida,
+                                descEnc13, sistema, valorEncargos13, dataOcorrencia);
+                    }
+
+                    continue;
+                }
+
                 if (descricaoItem.contains("CONTR PREV DESCONTA SEGURADO") ||
                         descricaoItem.contains("CP DESCONTADA SEGURADO")) {
 

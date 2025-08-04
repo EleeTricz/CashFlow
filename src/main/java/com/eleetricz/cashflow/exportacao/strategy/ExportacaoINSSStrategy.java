@@ -36,7 +36,7 @@ public class ExportacaoINSSStrategy implements ExportacaoStrategy {
 
         int mes = lancamento.getCompetenciaReferida().getMes();
         int ano = lancamento.getCompetenciaReferida().getAno();
-        linha.append(String.format("\"%02d/%04d - 13 SALARIO\"", mes, ano));
+        linha.append(String.format("\"%02d/%04d à 12/%04d - 13o SALARIO\"", mes, ano, ano));
 
         writer.write(linha.toString());
         writer.newLine();

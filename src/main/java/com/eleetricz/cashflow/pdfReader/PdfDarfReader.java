@@ -18,7 +18,7 @@ public class PdfDarfReader {
     private static final Pattern PADRAO_PRINCIPAL = Pattern.compile("(\\d{2}/\\d{2}/\\d{4})\\s+(\\d{2}/\\d{2}/\\d{4})\\s+(\\d{17})");
     private static final Pattern PADRAO_TOTAIS = Pattern.compile("Totais\\s+([\\d.,]+)\\s+([\\d.,]+)\\s+([\\d.,]+)\\s+([\\d.,]+)");
     private static final Pattern PADRAO_ARRECADACAO = Pattern.compile("Data de Arrecadação.*?(\\d{2}/\\d{2}/\\d{4})", Pattern.DOTALL);
-    private static final Pattern PADRAO_ITEM = Pattern.compile("(\\d{4})\\s+([A-Z\\-\\s]+?)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)");
+    private static final Pattern PADRAO_ITEM = Pattern.compile("(\\d{1,4})\\s*-?\\s*([A-ZÀ-Ÿ\\s/\\-]+?)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)\\s+([\\d.,\\-]+)");
 
     public List<DarfData> extrairTodosDados(File arquivoPdf) throws IOException {
         List<DarfData> resultados = new ArrayList<>();
@@ -31,6 +31,9 @@ public class PdfDarfReader {
                 stripper.setStartPage(i);
                 stripper.setEndPage(i);
                 String texto = stripper.getText(document);
+                System.out.println("-------------------INICIO DO TEXTO:----------------");
+                System.out.println(texto);
+                System.out.println("-------------------FIM DO TEXTO-------------------");
                 Optional<DarfData> dados = extrairDadosDeTexto(texto);
                 dados.ifPresent(resultados::add);
             }
@@ -68,17 +71,39 @@ public class PdfDarfReader {
             data.setDataArrecadacao(ma.group(1));
         }
 
-        Matcher mi = PADRAO_ITEM.matcher(texto);
-        while (mi.find()) {
-            ItensDarf item = new ItensDarf();
-            item.setCodigo(mi.group(1));
-            item.setDescricao(mi.group(2).trim());
-            item.setPrincipal(normalizar(mi.group(3)));
-            item.setMulta(normalizar(mi.group(4)));
-            item.setJuros(normalizar(mi.group(5)));
-            item.setTotal(normalizar(mi.group(6)));
-            data.getItens().add(item);
+        String[] linhas = texto.split("\\r?\\n");
+        List<String> linhasLimpa = new ArrayList<>();
+        for (String linha : linhas) {
+            if (!linha.trim().isEmpty()) {
+                linhasLimpa.add(linha.trim());
+            }
         }
+
+        for (int i = 0; i < linhasLimpa.size(); i++) {
+            String linha = linhasLimpa.get(i);
+
+            Matcher mi = PADRAO_ITEM.matcher(linha);
+            if (mi.find()) {
+                ItensDarf item = new ItensDarf();
+                item.setCodigo(mi.group(1));
+                String descricao = mi.group(2).trim();
+
+                // verifica se a próxima linha começa com "21 -"
+                if (i + 1 < linhasLimpa.size() && linhasLimpa.get(i + 1).matches("^21\\s*-.*")) {
+                    descricao += " - " + linhasLimpa.get(i + 1).trim();  // concatena com a linha de baixo
+                    i++; // pula a próxima linha pois já foi usada
+                }
+
+                item.setDescricao(descricao);
+                item.setPrincipal(normalizar(mi.group(3)));
+                item.setMulta(normalizar(mi.group(4)));
+                item.setJuros(normalizar(mi.group(5)));
+                item.setTotal(normalizar(mi.group(6)));
+
+                data.getItens().add(item);
+            }
+        }
+
 
         if (data.getNumeroDocumento() != null && data.getPeriodoApuracao() != null) {
             return Optional.of(data);
