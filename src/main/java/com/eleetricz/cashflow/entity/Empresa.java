@@ -15,6 +15,9 @@ public class Empresa {
     private Long id;
     private String nome;
 
+    @Column(length = 14, nullable = false)
+    private String cnpj; // SOMENTE NÚMEROS
+
     @ManyToOne
     private Usuario usuario;
 }

@@ -73,7 +73,7 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
             BigDecimal encargosMultaCLT = BigDecimal.ZERO;
 
             for (ItensDarf item : itens) {
-                String descricaoItem = item.getDescricao().toUpperCase();
+                String descricaoItem = normalizarDescricaoINSS(item.getDescricao());
                 BigDecimal principal = parse(item.getPrincipal());
                 BigDecimal multa     = parse(item.getMulta());
                 BigDecimal juros     = parse(item.getJuros());
@@ -258,4 +258,227 @@ public class LancamentoDarfServiceImpl implements LancamentoDarfService {
 
         return inseridos;
     }
+
+    private String normalizarDescricaoINSS(String descricao) {
+        if (descricao == null) return "";
+
+        String desc = descricao.toUpperCase();
+
+        // 🔹 REGRA NOVA:
+        // Se vier "INSS" direto do TaxConnect,
+        // trata como CP DESCONTADA SEGURADO
+        if (desc.equals("INSS")) {
+            return "CP DESCONTADA SEGURADO";
+        }
+
+        return desc;
+    }
+
+    @Transactional
+    public void importarTodosIntegra() {
+
+        Usuario sistema = getUsuarioByName("admin");
+
+        Map<Long, Empresa> empresaCache = new HashMap<>();
+        Map<String, Competencia> competenciaCache = new HashMap<>();
+
+        for (LancamentoDarf darf : darfRepo.findAll()) {
+
+            Empresa empresa = empresaCache.computeIfAbsent(
+                    darf.getEmpresa().getId(),
+                    id -> empresaRepo.findById(id)
+                            .orElseThrow(() -> new IllegalStateException("Empresa id=" + id + " não existe"))
+            );
+
+            // 🔹 COMPETÊNCIA DO PAGAMENTO
+            String compPagamentoStr = darf.getCompetencia(); // ex: 06/2025
+            String chavePagamento = compPagamentoStr + "-P-" + empresa.getId();
+
+            Competencia competenciaPagamento = competenciaCache.computeIfAbsent(
+                    chavePagamento,
+                    k -> criarOuObterCompetencia(compPagamentoStr, empresa)
+            );
+
+            // 🔹 COMPETÊNCIA DA APURAÇÃO
+            String compApuracaoStr = normalizarCompetencia(darf.getPeriodoApuracao());
+            String chaveApuracao = compApuracaoStr + "-A-" + empresa.getId();
+
+            Competencia competenciaApuracao = competenciaCache.computeIfAbsent(
+                    chaveApuracao,
+                    k -> criarOuObterCompetencia(compApuracaoStr, empresa)
+            );
+
+            // 🔹 DATA DO PAGAMENTO
+            LocalDate dataOcorrencia = darf.getDataArrecadacao();
+
+            List<ItensDarf> itens = itensRepo.findByLancamentoDarf(darf);
+
+            BigDecimal totalINSS = BigDecimal.ZERO;
+            BigDecimal encargosINSS = BigDecimal.ZERO;
+
+            BigDecimal totalIR = BigDecimal.ZERO;
+            BigDecimal encargosIR = BigDecimal.ZERO;
+
+            BigDecimal totalMultaCLT = BigDecimal.ZERO;
+            BigDecimal encargosMultaCLT = BigDecimal.ZERO;
+
+            for (ItensDarf item : itens) {
+
+                String descricaoItem = normalizarDescricaoINSS(item.getDescricao());
+                BigDecimal principal = parse(item.getPrincipal());
+                BigDecimal multa = parse(item.getMulta());
+                BigDecimal juros = parse(item.getJuros());
+                BigDecimal encargos = multa.add(juros);
+
+                // 🔹 INSS 13º
+                if (descricaoItem.contains("13 SALÁRIO")) {
+
+                    if (principal.compareTo(BigDecimal.ZERO) > 0) {
+                        salvarSeNaoExistir(
+                                empresa,
+                                competenciaPagamento,
+                                competenciaApuracao,
+                                getOrCreateDescricao("INSS 13º"),
+                                sistema,
+                                principal,
+                                dataOcorrencia
+                        );
+                    }
+
+                    if (encargos.compareTo(BigDecimal.ZERO) > 0) {
+                        salvarSeNaoExistir(
+                                empresa,
+                                competenciaPagamento,
+                                competenciaApuracao,
+                                getOrCreateDescricao("ENCARGOS INSS 13º"),
+                                sistema,
+                                encargos,
+                                dataOcorrencia
+                        );
+                    }
+                    continue;
+                }
+
+                // 🔹 INSS
+                if (descricaoItem.contains("CONTR PREV DESCONTA SEGURADO")
+                        || descricaoItem.contains("CP DESCONTADA SEGURADO")) {
+
+                    totalINSS = totalINSS.add(principal);
+                    encargosINSS = encargosINSS.add(encargos);
+
+                }
+                // 🔹 IRRF
+                else if (descricaoItem.contains("IRRF")) {
+
+                    totalIR = totalIR.add(principal);
+                    encargosIR = encargosIR.add(encargos);
+
+                }
+                // 🔹 MULTA CLT
+                else if (descricaoItem.contains("MULTA DA CLT")) {
+
+                    totalMultaCLT = totalMultaCLT.add(principal);
+                    encargosMultaCLT = encargosMultaCLT.add(encargos);
+                }
+            }
+
+            // 🔹 SALVAR INSS
+            if (totalINSS.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("INSS"),
+                        sistema,
+                        totalINSS,
+                        dataOcorrencia
+                );
+            }
+
+            if (encargosINSS.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("ENCARGOS INSS"),
+                        sistema,
+                        encargosINSS,
+                        dataOcorrencia
+                );
+            }
+
+            // 🔹 SALVAR IR
+            if (totalIR.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("IRRF"),
+                        sistema,
+                        totalIR,
+                        dataOcorrencia
+                );
+            }
+
+            if (encargosIR.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("ENCARGOS IRRF"),
+                        sistema,
+                        encargosIR,
+                        dataOcorrencia
+                );
+            }
+
+            // 🔹 SALVAR MULTA CLT
+            if (totalMultaCLT.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("MULTA CLT"),
+                        sistema,
+                        totalMultaCLT,
+                        dataOcorrencia
+                );
+            }
+
+            if (encargosMultaCLT.compareTo(BigDecimal.ZERO) > 0) {
+                salvarSeNaoExistir(
+                        empresa,
+                        competenciaPagamento,
+                        competenciaApuracao,
+                        getOrCreateDescricao("ENCARGOS MULTA CLT"),
+                        sistema,
+                        encargosMultaCLT,
+                        dataOcorrencia
+                );
+            }
+        }
+    }
+
+
+    private String normalizarCompetencia(String valor) {
+
+        if (valor == null || valor.isBlank()) {
+            throw new IllegalArgumentException("Competência vazia");
+        }
+
+        // Se vier no formato dd/MM/yyyy → converte para MM/yyyy
+        if (valor.matches("\\d{2}/\\d{2}/\\d{4}")) {
+            LocalDate data = LocalDate.parse(valor, BR_DATE);
+            return data.format(COMP_DATE);
+        }
+
+        // Se já estiver MM/yyyy
+        if (valor.matches("\\d{2}/\\d{4}")) {
+            return valor;
+        }
+
+        throw new IllegalArgumentException("Formato inválido de competência: " + valor);
+    }
+
+
 }

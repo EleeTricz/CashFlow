@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Importar - Tipos de Arquivo</title>
+    <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body class="bg-green-50 min-h-screen flex flex-col items-center justify-center font-sans">
@@ -45,6 +46,23 @@
         <div class="text-lg font-semibold text-green-800">Entradas (Questor)</div>
         <p class="text-sm text-green-600 mt-1">Importar lançamentos com base em relatório de conferência de saídas</p>
     </a>
+
+    <a href="/integracoes/taxconnect"
+       class="bg-white hover:bg-green-100 border border-green-300 p-6 rounded-2xl shadow-lg
+          text-center w-full max-w-xs md:w-72 transition">
+
+        <div class="text-4xl mb-2">🔗</div>
+
+        <div class="text-lg font-semibold text-green-800">
+            TaxConnect (API)
+        </div>
+
+        <p class="text-sm text-green-600 mt-1">
+            Consulta automática de pagamentos via API do IntegraContador,
+            com importação direta para o sistema
+        </p>
+    </a>
+
 </div>
 
 <!-- Voltar -->

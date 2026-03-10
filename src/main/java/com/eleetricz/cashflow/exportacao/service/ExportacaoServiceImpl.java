@@ -36,7 +36,8 @@ public class ExportacaoServiceImpl implements ExportacaoService {
             entry("DARF CSLL", new ExportacaoDarfCSLLStrategy()),
             entry("DARF IRPJ", new ExportacaoDarfIRPJStrategy()),
             entry("FERIAS", new ExportacaoFeriasStrategy()),
-            entry("RESCISAO", new ExportacaoRescisaoStrategy())
+            entry("RESCISAO", new ExportacaoRescisaoStrategy()),
+            entry("EMPRESTIMO CREDITO DO TRABALHADOR", new ExportacaoFGTSEmprestimoCreditoTrabalhadorStrategy())
             // Adicione outras aqui conforme necessário
     );
 
@@ -44,7 +45,11 @@ public class ExportacaoServiceImpl implements ExportacaoService {
             "COMPRAS A VISTA",
             "RECEITAS DE VENDAS",
             "CAIXA INICIAL",
-            "SERVIÇOS"
+            "SERVIÇOS",
+            "ORDENADOS SALARIOS",
+            "PROLABORE",
+            "ADIANTAMENTO 13º",
+            "SALARIO INTEGRAL 13º"
             // Outras descrições que não devem gerar exportação
     );
 

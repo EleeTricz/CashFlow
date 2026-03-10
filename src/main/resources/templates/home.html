@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>CashFlow - Início</title>
+    <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
@@ -40,18 +41,7 @@
 <body class="bg-gradient-to-br from-green-50 to-white dark:from-gray-900 dark:to-gray-800 text-green-900 dark:text-green-100 font-sans min-h-screen pt-20 flex flex-col items-center">
 
 <!-- Navbar -->
-<header class="fixed top-0 left-0 w-full px-6 py-3 flex justify-between items-center bg-white dark:bg-gray-900 shadow-md z-10">
-    <div class="text-green-700 dark:text-green-100 font-bold text-xl flex items-center gap-2">
-        <div class="bg-green-600 text-white p-2 rounded-full">CF</div>
-        <span>CashFlow</span>
-    </div>
-    <nav class="flex items-center gap-4">
-        <a href="/" class="text-green-600 dark:text-green-300 hover:underline text-sm">Início</a>
-        <button id="toggle-theme" class="text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-100 text-sm">
-            <span id="theme-icon">🌙</span>
-        </button>
-    </nav>
-</header>
+<div th:replace="fragments/navbar :: navbar"></div>
 
 <!-- Conteúdo principal -->
 <main class="animate-fade-in-down flex flex-col items-center px-4">
@@ -88,9 +78,7 @@
 </main>
 
 <!-- Rodapé -->
-<footer class="mt-12 text-center text-sm text-green-600 dark:text-green-300 opacity-80">
-    Desenvolvido internamente por EleeTricz (Eriky Simões) • CashFlow &copy; 2025
-</footer>
+<div th:replace="fragments/footer :: footer"></div>
 
 <!-- Scripts finais -->
 <script>
