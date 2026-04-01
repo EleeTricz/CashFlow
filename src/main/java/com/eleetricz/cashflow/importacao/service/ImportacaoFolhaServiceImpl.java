@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -37,36 +37,19 @@ public class ImportacaoFolhaServiceImpl implements ImportacaoFolhaService {
             Empresa empresa = empresaRepository.findById(empresaId)
                     .orElseThrow(() -> new IllegalArgumentException("Empresa não encontrada: " + empresaId));
             while ((line = reader.readLine()) != null) {
-                String[] cols = line.split(",");
-                LocalDate data = LocalDate.parse(cols[1].trim(), dataFmt);
-                Long contaCredito = Long.valueOf(cols[3].trim());
-                BigDecimal valor = new BigDecimal(cols[4].trim());
-                String complemento = cols[6].replaceAll("\"", "").trim();
-
-                String nomeDescricao;
-
-                if (contaCredito == 1634L) {
-                    if (complemento.toLowerCase().contains("rescisao")) {
-                        nomeDescricao = "RESCISAO";
-                    } else if (complemento.toLowerCase().contains("liquido do 13o salario adiantamento")) {
-                        nomeDescricao = "ADIANTAMENTO 13º";
-                    } else if (complemento.toLowerCase().contains("liquido de 13o salario")) {
-                        nomeDescricao = "SALARIO INTEGRAL 13º";
-                    } else {
-                        nomeDescricao = "ORDENADOS SALARIOS";
-                    }
-                } else {
-                    Map<Long, String> contaParaDescricao = Map.of(
-                            1635L, "PROLABORE",
-                            313L, "FERIAS"
-                    );
-
-                    nomeDescricao = contaParaDescricao.get(contaCredito);
-
-                    if (nomeDescricao == null) {
-                        throw new IllegalArgumentException("Conta crédito não mapeada: " + contaCredito);
-                    }
+                if (line.isBlank()) {
+                    continue;
                 }
+                // Novo layout: 1, ddMMyyyy, 0, 5, valor, codigo,"complemento" — limit 7 preserva vírgulas no texto
+                String[] cols = line.split(",", 7);
+                if (cols.length < 7) {
+                    throw new IllegalArgumentException("Linha inválida (esperados 7 campos): " + line);
+                }
+                LocalDate data = LocalDate.parse(cols[1].trim(), dataFmt);
+                BigDecimal valor = new BigDecimal(cols[4].trim());
+                String complemento = cols[6].replace("\"", "").trim();
+
+                String nomeDescricao = resolverNomeDescricao(complemento);
 
                 Descricao descricao = descricaoRepository.findByNomeIgnoreCase(nomeDescricao)
                         .orElseThrow(() -> new IllegalArgumentException("Descrição " + nomeDescricao + " não encontrada"));
@@ -82,6 +65,35 @@ public class ImportacaoFolhaServiceImpl implements ImportacaoFolhaService {
 
             }
         }
+    }
+
+    /**
+     * Layout atual: tipo definido pelo texto do complemento (conta contábil fixa no arquivo, ex.: 5).
+     * Mantém compatibilidade com textos do layout antigo (1634/1635/313) quando o complemento for o mesmo padrão.
+     */
+    private String resolverNomeDescricao(String complemento) {
+        String c = complemento.toLowerCase(Locale.ROOT);
+        if (c.contains("rescisao") || c.contains("rescisão")) {
+            return "RESCISAO";
+        }
+        if (c.contains("pro-labore") || c.contains("prolabore")) {
+            return "PROLABORE";
+        }
+        if (c.contains("adiantamento") && (c.contains("13o") || c.contains("13º") || c.contains("13"))) {
+            return "ADIANTAMENTO 13º";
+        }
+        if ((c.contains("liquido de 13o salario") || c.contains("liquido de 13º salario")
+                || c.contains("líquido de 13o salario") || c.contains("líquido de 13º salario"))
+                && !c.contains("adiantamento")) {
+            return "SALARIO INTEGRAL 13º";
+        }
+        if (c.contains("ferias") || c.contains("férias")) {
+            return "FERIAS";
+        }
+        if (c.contains("liquido da folha") || c.contains("líquido da folha")) {
+            return "ORDENADOS SALARIOS";
+        }
+        throw new IllegalArgumentException("Complemento não mapeado para descrição conhecida: " + complemento);
     }
 
     private Competencia criarOuObterCompetencia(String chave, Empresa empresa) {

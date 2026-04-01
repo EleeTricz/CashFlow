@@ -1,67 +1,90 @@
- ---
+# CashFlow
 
-# 💸 CashFlow
+CashFlow é uma aplicação web para **controle de caixa** por empresa e competência: registra entradas e saídas, associa movimentações a **descrições contábeis padronizadas** e gera **códigos contábeis** conforme regras do sistema.
 
-CashFlow é um sistema web de controle financeiro desenvolvido com Java Spring Boot, Thymeleaf e TailwindCSS. Ele permite o registro de entradas e saídas de caixa por empresa e competência, com geração automática de códigos contábeis baseados em descrições padronizadas.
+O foco operacional é **integrar com o Questor**: o CashFlow **importa** arquivos gerados a partir do Questor (ou fluxos alinhados a ele) para criar lançamentos no caixa e **exporta** lançamentos em **TXT** prontos para **importação de volta no Questor**, reduzindo retrabalho na conferência e nos lançamentos.
 
-## ✨ Funcionalidades
+---
 
-- Cadastro de empresas e competências.
-- Lançamentos de entradas e saídas com vinculação a descrições contábeis.
-- Códigos contábeis gerados automaticamente conforme a descrição.
-- Controle por usuário: cada usuário vê apenas suas empresas, enquanto o admin vê todas.
-- Relatórios de saldo por empresa e competência.
-- Interface responsiva e simples com TailwindCSS.
-- Estrutura desacoplável para futura migração para frontend SPA (React/Vue/etc).
+## Integração com o Questor
 
-## 🧱 Tecnologias
+| Direção | O que faz |
+|--------|-----------|
+| **Entrada (importação)** | Importação de **folha de pagamento** (texto exportado do Questor), **entradas** com base em relatório de conferência de saídas, além de outras rotas de importação (planilhas, PDFs, etc.) na área **Importação Geral**. |
+| **Saída (exportação)** | **Exportar TXT** — gera arquivo no formato esperado para importação no Questor, com estratégias de linha por tipo de descrição (DAS, DARF, parcelamentos, folha, entre outras). |
 
-- Java 17
-- Spring Boot (REST API, JPA, Spring Security)
-- Thymeleaf (para renderização server-side)
-- TailwindCSS (interface e design)
-- PostgreSQL (armazenamento de dados)
+Fluxo típico: movimentações e relatórios saem do Questor → o CashFlow consolida e classifica no caixa → ajustes e conferência → exportação TXT → retorno ao Questor.
 
-## ⚙️ Como rodar localmente
+---
 
-1. Clone o repositório:
-   ```bash
-   git clone https://github.com/seuusuario/cashflow.git
-   cd cashflow
-   ````
+## Principais funcionalidades
 
-2. Configure o banco de dados PostgreSQL no arquivo `application.properties`.
+- Cadastro de **empresas**, **competências** e **usuários**; lançamentos vinculados a empresa, competência e descrição.
+- **Lançamentos** de entrada e saída, com rastreio por descrição contábil e data de ocorrência.
+- **Relatórios** de saldo por empresa e competência.
+- **Exportação** de lançamentos para TXT (Questor) e fluxos de **exportação geral** na interface.
+- **Importação geral** centralizada em `/importartf/todas` (folha Questor, entradas Questor, DAE, integrações, etc.).
+- **TaxConnect**: consulta de pagamentos via API do IntegraContador (serviço configurável em `application.properties`).
+- **DAE** (planilha com pré-visualização), **DAS** (PDF), **DARF** e importação **Excel**, conforme telas do sistema.
+- Interface web com **Thymeleaf** e **Tailwind CSS** (inclui suporte a tema claro/escuro na página inicial).
 
-3. Execute a aplicação:
+---
+
+## Tecnologias
+
+- Java 17  
+- Spring Boot 3.4 (Web, Data JPA)  
+- Thymeleaf  
+- PostgreSQL  
+- Apache POI (Excel)  
+- Apache PDFBox (PDF)  
+- Lombok  
+
+---
+
+## Estrutura do código (pacotes principais)
+
+- `controller` — controllers MVC (telas) e API REST onde existir  
+- `service` — regras de negócio e serviços de domínio  
+- `repository` — acesso a dados (Spring Data JPA)  
+- `entity` — entidades e enums  
+- `importacao` — importações (folha, entradas, DAE, etc.)  
+- `exportacao` — exportação TXT e estratégias por descrição  
+- `taxconnect` — integração TaxConnect / IntegraContador  
+- `templates` — páginas HTML Thymeleaf  
+- `resources` — `application.properties`, assets estáticos  
+
+---
+
+## Como rodar localmente
+
+1. **Pré-requisitos:** JDK 17, Maven (ou use o wrapper `mvnw` / `mvnw.cmd` na raiz do projeto), PostgreSQL em execução.
+
+2. **Banco de dados:** crie o banco (o exemplo abaixo usa `caixadb`) e ajuste usuário e senha em `src/main/resources/application.properties`:
+   - `spring.datasource.url`
+   - `spring.datasource.username`
+   - `spring.datasource.password`
+
+3. **Executar:**
 
    ```bash
    ./mvnw spring-boot:run
    ```
 
-4. Acesse em: [http://localhost:8080](http://localhost:8080)
+   No Windows (PowerShell):
 
-## 🔐 Acesso
+   ```powershell
+   .\mvnw.cmd spring-boot:run
+   ```
 
-* Rota principal em: [http://localhost:8080/empresastf/todas](http://localhost:8080/empresastf/todas)
-
-## 📁 Organização em camadas
-
-* `controller` – Camada REST e MVC
-* `service` – Lógica de negócios
-* `repository` – Acesso a dados
-* `entity` – Entidades e enums
-* `templates` – Páginas Thymeleaf
-
-## 📌 Objetivo
-
-O CashFlow foi criado para pequenas empresas e contadores que precisam de uma ferramenta simples e eficaz para registrar movimentações financeiras com rastreabilidade contábil.
-
-## 📄 Licença
-
-Este é um software proprietário. Todos os direitos reservados.  
-O uso, cópia ou modificação não são permitidos sem autorização expressa do autor.
+4. **Acesso:** a porta padrão no `application.properties` do projeto é **8082** (altere `server.port` se necessário). Exemplos:
+   - Início: `http://localhost:8082/`
+   - Empresas: `http://localhost:8082/empresastf/todas`
+   - Importação geral: `http://localhost:8082/importartf/todas`
+   - Exportação: `http://localhost:8082/exportacaotf`
 
 ---
 
+## Licença
 
-
+Software proprietário. Todos os direitos reservados. Uso, cópia ou modificação apenas com autorização expressa do titular.
