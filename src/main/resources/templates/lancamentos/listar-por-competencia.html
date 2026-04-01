@@ -31,8 +31,37 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
         <div class="bg-white p-6 rounded-lg shadow-md">
             <p class="text-gray-600 text-sm">Competência</p>
-            <p class="text-xl font-bold text-green-600"
-               th:text="${competencia.mes} + '/' + ${competencia.ano}">05/2025</p>
+
+            <div class="flex items-center gap-3 mt-2">
+
+                <!-- seta anterior -->
+                <button type="button"
+                        onclick="competenciaAnterior()"
+                        class="p-2 rounded-lg border hover:bg-green-50">
+                    <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                </button>
+
+                <!-- seletor -->
+                <select id="competenciaSelect"
+                        onchange="trocarCompetencia(this)"
+                        class="border rounded-lg p-2 flex-1">
+
+                    <option th:each="c : ${competencias}"
+                            th:value="${c.id}"
+                            th:selected="${c.id == competencia.id}"
+                            th:text="${c.mes + '/' + c.ano}">
+                    </option>
+
+                </select>
+
+                <!-- seta próxima -->
+                <button type="button"
+                        onclick="proximaCompetencia()"
+                        class="p-2 rounded-lg border hover:bg-green-50">
+                    <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                </button>
+
+            </div>
         </div>
         <div class="bg-white p-6 rounded-lg shadow-md">
             <p class="text-gray-600 text-sm">Saldo Total</p>
@@ -89,7 +118,9 @@
             </tr>
             </thead>
             <tbody>
-            <tr th:each="l : ${lancamentos}" class="border-t hover:bg-green-50 text-sm">
+            <tr th:each="l : ${lancamentos}"
+                th:attr="data-id=${l.id}"
+                class="border-t hover:bg-green-50 text-sm">
                 <td class="px-4 py-3">
                     <span th:text="${l.descricao.nome}">Descrição</span>
                     <small class="block text-xs text-gray-500" th:text="${l.observacao}">Obs</small>
@@ -97,31 +128,53 @@
                 <td class="px-4 py-3" th:text="${l.descricao.codigoDebito}">Débito</td>
                 <td class="px-4 py-3" th:text="${l.descricao.codigoCredito}">Crédito</td>
                 <td class="px-4 py-3" th:text="${l.descricao.codigoHistorico}">Histórico</td>
-                <td class="px-4 py-3">
+                <td class="px-4 py-3 tipo"
+                    th:data-tipo="${l.tipo}">
                     <span th:text="${l.tipo}"
                           th:classappend="${l.tipo.name() == 'ENTRADA' ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}">
                         Tipo
                     </span>
                 </td>
-                <td class="px-4 py-3" th:text="'R$ ' + ${#numbers.formatDecimal(l.valor, 1, 'POINT', 2, 'COMMA')}">R$ 0,00</td>
+                <td class="px-4 py-3 valor"
+                    th:data-valor="${l.valor}"
+                    th:text="'R$ ' + ${#numbers.formatDecimal(l.valor, 1, 'POINT', 2, 'COMMA')}">
+                </td>
                 <td class="px-4 py-3"
                     th:text="${ l.competenciaReferida != null
                                ? l.competenciaReferida.mes + '/' + l.competenciaReferida.ano
                                : '-' }">
                 </td>
-                <td class="px-4 py-3"
+                <td class="px-4 py-3 data"
                     th:text="${l.dataOcorrencia != null
                                ? l.dataOcorrencia.format(
                                    T(java.time.format.DateTimeFormatter)
                                      .ofPattern('dd/MM/yyyy'))
-                               : ''}">01/01/2024</td>
+                               : ''}"
+                    th:data-data="${l.dataOcorrencia}">01/01/2024
+                </td>
                 <td class="px-4 py-3 flex gap-2">
-                    <!-- Botões com ícones -->
+
+                    <button onclick="editarLinha(this)"
+                            class="text-blue-600 hover:text-blue-800">
+                        <i data-lucide="pencil" class="w-5 h-5"></i>
+                    </button>
+
+                    <button onclick="salvarLinha(this)"
+                            class="text-green-600 hover:text-green-800 hidden">
+                        <i data-lucide="save" class="w-5 h-5"></i>
+                    </button>
+
+                    <button onclick="cancelarEdicao(this)"
+                            class="text-gray-600 hover:text-gray-800 hidden">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+
                     <a th:href="@{/lancamentostf/excluir/{id}/{empresaId}/{competenciaId}(id=${l.id}, empresaId=${empresaId}, competenciaId=${competenciaId})}"
                        class="text-red-500 hover:text-red-700"
                        onclick="return confirm('Tem certeza que deseja excluir este lançamento?')">
                         <i data-lucide="trash-2" class="w-5 h-5"></i>
                     </a>
+
                 </td>
             </tr>
             </tbody>
@@ -132,6 +185,113 @@
 
 <script>
     lucide.createIcons();
+
+    function editarLinha(btn){
+
+    let row = btn.closest("tr")
+
+    let valor = row.querySelector(".valor")
+    let tipo = row.querySelector(".tipo")
+    let data = row.querySelector(".data")
+
+    let valorAtual = valor.dataset.valor
+    let tipoAtual = tipo.dataset.tipo
+    let dataAtual = data.dataset.data
+
+    valor.innerHTML = `<input type="number" step="0.01" value="${valorAtual}" class="border rounded p-1 w-24">`
+
+    tipo.innerHTML = `
+    <select class="border rounded p-1">
+    <option ${tipoAtual === 'ENTRADA' ? 'selected' : ''}>ENTRADA</option>
+    <option ${tipoAtual === 'SAIDA' ? 'selected' : ''}>SAIDA</option>
+    </select>
+    `
+
+    data.innerHTML = `<input type="date" value="${dataAtual}" class="border rounded p-1">`
+
+    let buttons = row.querySelectorAll("button")
+
+    buttons[0].classList.add("hidden")
+    buttons[1].classList.remove("hidden")
+    buttons[2].classList.remove("hidden")
+
+    }
+
+    function salvarLinha(btn){
+
+    let row = btn.closest("tr")
+
+    let id = row.dataset.id
+    let valor = row.querySelector(".valor input").value
+    let tipo = row.querySelector(".tipo select").value
+    let data = row.querySelector(".data input").value
+
+    fetch("/lancamentostf/atualizar-inline", {
+    method:"POST",
+    headers:{
+    'Content-Type':'application/x-www-form-urlencoded'
+    },
+    body:`id=${id}&valor=${valor}&tipo=${tipo}&data=${data}`
+    })
+    .then(response => {
+
+    if(!response.ok){
+    throw new Error("Erro ao salvar")
+    }
+
+    return response.text()
+
+    })
+    .then(data => {
+
+    console.log("salvo:", data)
+
+    location.reload()
+
+    })
+    .catch(err => {
+
+    alert("Erro ao salvar lançamento")
+    console.error(err)
+
+    })
+
+    }
+
+    function cancelarEdicao(btn){
+
+    location.reload()
+
+    }
+
+    function trocarCompetencia(select){
+
+    let competenciaId = select.value
+    let empresaId = [[${empresa.id}]]
+
+    window.location.href =
+    "/lancamentostf/competencia/" + empresaId + "/" + competenciaId
+
+    }
+
+    function competenciaAnterior() {
+    const select = document.getElementById("competenciaSelect");
+
+    if (select.selectedIndex > 0) {
+        select.selectedIndex -= 1;
+        trocarCompetencia(select);
+    }
+    }
+
+function proximaCompetencia() {
+    const select = document.getElementById("competenciaSelect");
+
+    if (select.selectedIndex < select.options.length - 1) {
+        select.selectedIndex += 1;
+        trocarCompetencia(select);
+    }
+    }
+
 </script>
 </body>
 </html>

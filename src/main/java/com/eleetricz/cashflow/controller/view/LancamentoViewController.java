@@ -89,8 +89,13 @@ public class LancamentoViewController {
 
         List<LancamentoEsperado> pendencias = auditoriaService.verificarPendencias(empresaId, compStr);
 
+        List<Competencia> competencias =
+                competenciaService.listarPorEmpresaCronologico(empresa);
+
+
         model.addAttribute("empresa", empresa);
         model.addAttribute("competencia", competencia);
+        model.addAttribute("competencias", competencias);
         model.addAttribute("lancamentos", lancamentos);
         model.addAttribute("saldo", saldoPorMes.get(competencia.getMes() + "/" + competencia.getAno()));
         model.addAttribute("pendencias", pendencias);
@@ -215,6 +220,24 @@ public class LancamentoViewController {
         return "compras-receitas/resumo";
     }
 
+    @PostMapping("/atualizar-inline")
+    @ResponseBody
+    public String atualizarInline(
+            @RequestParam Long id,
+            @RequestParam String tipo,
+            @RequestParam BigDecimal valor,
+            @RequestParam String data
+    ) {
 
+        Lancamento lanc = lancamentoService.buscarPorId(id);
+
+        lanc.setTipo(TipoLancamento.valueOf(tipo));
+        lanc.setValor(valor);
+        lanc.setDataOcorrencia(LocalDate.parse(data));
+
+        lancamentoService.salvar(lanc);
+
+        return "OK";
+    }
 
 }

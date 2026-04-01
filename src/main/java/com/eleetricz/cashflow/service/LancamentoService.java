@@ -25,5 +25,6 @@ public interface LancamentoService {
     List<ReceitaCompraResumoDTO> getResumoReceitaCompraAnual(Long empresaId, int ano);
     void deletarLancamentosPorEmpresa(Long empresaId);
     public List<Integer> getAnosComLancamentos(Long empresaId);
+    Lancamento buscarPorId(Long id);
 
 }
