@@ -10,4 +10,5 @@ public interface CompetenciaService {
     List<Competencia> listarPorEmpresa(Empresa empresa);
     Competencia buscarOuCriar(int mes, int ano, Empresa empresa);
     Competencia buscarPorId(Long id);
+    List<Competencia> listarPorEmpresaCronologico(Empresa empresa);
 }

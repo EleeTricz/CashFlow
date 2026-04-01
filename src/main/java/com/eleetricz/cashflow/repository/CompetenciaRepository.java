@@ -10,4 +10,5 @@ import java.util.Optional;
 public interface CompetenciaRepository extends JpaRepository<Competencia, Long> {
     List<Competencia> findByEmpresa(Empresa empresa);
     Optional<Competencia> findByMesAndAnoAndEmpresa(int mes, int ano, Empresa empresa);
+    List<Competencia> findByEmpresaOrderByAnoAscMesAsc(Empresa empresa);
 }

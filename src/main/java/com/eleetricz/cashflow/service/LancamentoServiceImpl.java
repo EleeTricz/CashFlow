@@ -193,4 +193,10 @@ public class LancamentoServiceImpl implements LancamentoService{
     public List<Integer> getAnosComLancamentos(Long empresaId){
       return lancamentoRepository.findAnosComLancamentos(empresaId);
     }
+
+    @Override
+    public Lancamento buscarPorId(Long id) {
+        return lancamentoRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Lançamento não encontrado"));
+    }
 }

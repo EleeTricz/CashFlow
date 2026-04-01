@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/integracoes/taxconnect")
@@ -31,11 +32,22 @@ public class TaxConnectThymeleafController {
     @PostMapping("/importar")
     public String importar(
             @ModelAttribute("form") ImportacaoTaxConnectFormDTO form,
-            Model model) {
+            RedirectAttributes redirectAttributes) {
 
-        importacaoService.importar(form);
+        try {
+            importacaoService.importar(form);
 
-        model.addAttribute("sucesso", "Importação realizada com sucesso!");
+            redirectAttributes.addFlashAttribute(
+                    "mensagem",
+                    "Importação realizada com sucesso!"
+            );
+
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute(
+                    "erro",
+                    "Erro ao importar: " + e.getMessage()
+            );
+        }
 
         return "redirect:/integracoes/taxconnect";
     }

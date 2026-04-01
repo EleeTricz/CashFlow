@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Pre-visualizacao DAE</title>
+    <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 px-4 py-10">
+
+<div class="max-w-6xl mx-auto bg-white/95 border border-green-200 p-8 md:p-10 rounded-3xl shadow-xl">
+
+    <div class="mb-7 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+            <p class="text-sm font-medium text-green-600 uppercase tracking-wide">Revisao</p>
+            <h1 class="text-3xl font-bold text-green-800">Pre-visualizacao da Importacao DAE</h1>
+            <p class="text-green-700 mt-1">Confira os registros antes de confirmar o lancamento para a empresa selecionada.</p>
+        </div>
+        <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3 text-sm">
+            Total de registros:
+            <span class="font-bold" th:text="${#lists.size(registros)}">0</span>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto rounded-2xl border border-green-200">
+        <table class="w-full text-sm">
+            <thead>
+        <tr class="bg-green-100 text-green-900">
+            <th class="p-3 text-left font-semibold">Natureza</th>
+            <th class="p-3 text-left font-semibold">Data</th>
+            <th class="p-3 text-right font-semibold">Valor</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="r : ${registros}" class="odd:bg-white even:bg-green-50/50 border-t border-green-100">
+            <td class="p-3 text-green-900 font-medium" th:text="${r.naturezaReceita}"></td>
+            <td class="p-3 text-green-800" th:text="${r.dataPagamento}"></td>
+            <td class="p-3 text-right text-green-800 font-semibold" th:text="${r.valor}"></td>
+        </tr>
+        </tbody>
+    </table>
+    </div>
+
+    <form method="post"
+          th:action="@{/importacao-dae/confirmar}"
+          class="mt-7 flex flex-col sm:flex-row gap-3">
+        <input type="hidden" name="empresaId" th:value="${empresaId}">
+
+        <button type="submit"
+                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition">
+            Confirmar Importacao
+        </button>
+        <a href="/importacao-dae"
+           class="bg-white hover:bg-green-50 text-green-700 border border-green-300 font-semibold px-6 py-3 rounded-xl transition text-center">
+            Voltar e ajustar arquivo
+        </a>
+    </form>
+
+</div>
+
+</body>
+</html>

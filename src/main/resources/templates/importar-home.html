@@ -6,7 +6,7 @@
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="bg-green-50 min-h-screen flex flex-col items-center justify-center font-sans">
+<body class="bg-gradient-to-b from-green-50 to-emerald-100 min-h-screen flex flex-col items-center justify-center font-sans">
 
 <!-- Cabeçalho -->
 <div class="mb-10 text-center">
@@ -60,6 +60,21 @@
         <p class="text-sm text-green-600 mt-1">
             Consulta automática de pagamentos via API do IntegraContador,
             com importação direta para o sistema
+        </p>
+    </a>
+
+    <a href="/importacao-dae"
+       class="bg-white hover:bg-green-100 border border-green-300 p-6 rounded-2xl shadow-lg
+          text-center w-full max-w-xs md:w-72 transition">
+
+        <div class="text-4xl mb-2">🧾</div>
+
+        <div class="text-lg font-semibold text-green-800">
+            DAE (Planilha)
+        </div>
+
+        <p class="text-sm text-green-600 mt-1">
+            Importar planilha DAE com pre-visualizacao antes da confirmacao
         </p>
     </a>
 

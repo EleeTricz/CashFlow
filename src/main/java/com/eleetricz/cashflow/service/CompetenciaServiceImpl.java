@@ -34,4 +34,9 @@ public class CompetenciaServiceImpl implements CompetenciaService{
     public Competencia buscarPorId(Long id) {
         return competenciaRepository.findById(id).orElse(null);
     }
+
+    @Override
+    public List<Competencia> listarPorEmpresaCronologico(Empresa empresa) {
+        return competenciaRepository.findByEmpresaOrderByAnoAscMesAsc(empresa);
+    }
 }
