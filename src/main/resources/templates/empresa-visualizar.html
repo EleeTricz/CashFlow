@@ -44,15 +44,15 @@
         </div>
 
         <div class="flex flex-wrap gap-3 bg-green-50 p-3 rounded-lg border border-gray-200">
-            <!-- Importar Planilha -->
-            <a th:href="@{'/importacaotf/excel/' + ${empresa.id}}"
-               class="inline-flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition text-sm shadow">
+            <!-- Importar TaxConnect -->
+            <a th:href="@{'/integracoes/taxconnect/empresa/' + ${empresa.id}}"
+               class="inline-flex items-center gap-2 bg-emerald-600 text-white px-4 py-2 rounded-lg hover:bg-emerald-700 transition text-sm shadow">
                 <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none"
                      viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                          d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1M12 12V4m0 8l-4-4m4 4l4-4" />
+                          d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10" />
                 </svg>
-                Importar Planilha
+                Importar TaxConnect
             </a>
 
             <!-- Zerar Lançamentos -->
