@@ -10,9 +10,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +22,7 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
     private final DescricaoRepository descricaoRepository;
     private final CompetenciaRepository competenciaRepository;
     private final LancamentoRepository lancamentoRepository;
+    private final FechamentoStatusRepository fechamentoStatusRepository;
 
     private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -72,7 +71,43 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
             inseridos++;
         }
 
+        Set<String> competenciasProcessadas = new HashSet<>();
+
+        for (FgtsData data : dadosExtraidos) {
+            competenciasProcessadas.add(data.getCompetencia());
+        }
+
+        for (String competenciaString : competenciasProcessadas) {
+            Competencia competencia = getOrCreateCompetenciaFromService(competenciaString, empresa);
+
+            FechamentoStatus status = fechamentoStatusRepository
+                    .findByEmpresaAndCompetencia(empresa, competencia)
+                    .orElseGet(() -> FechamentoStatus.builder()
+                            .empresa(empresa)
+                            .competencia(competencia)
+                            .build());
+
+            status.setFgtsStatus(StatusTarefa.CONCLUIDO);
+            fechamentoStatusRepository.save(status);
+        }
+
         return inseridos;
+    }
+
+    // Método auxiliar para ser usado pelos serviços
+    private Competencia getOrCreateCompetenciaFromService(String chave, Empresa empresa) {
+        String[] partes = chave.split("/");
+        int mes = Integer.parseInt(partes[0]);
+        int ano = Integer.parseInt(partes[1]);
+
+        return competenciaRepository.findByMesAndAnoAndEmpresa(mes, ano, empresa)
+                .orElseGet(() -> competenciaRepository.save(
+                        Competencia.builder()
+                                .mes(mes)
+                                .ano(ano)
+                                .empresa(empresa)
+                                .build()
+                ));
     }
 
     @Override

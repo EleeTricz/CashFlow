@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel de Status de Fechamento</title>
+    <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-emerald-50 min-h-screen">
+
+<div class="max-w-7xl mx-auto px-6 py-8">
+
+    <!-- Cabeçalho -->
+    <div class="mb-8 flex items-start justify-between gap-4">
+        <div>
+            <h1 class="text-3xl font-bold text-emerald-800">
+                Painel de Fechamento Contábil
+            </h1>
+            <p class="text-emerald-600 mt-1">
+                Acompanhe o andamento das competências por empresa
+            </p>
+        </div>
+
+        <a th:href="@{/}"
+           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-700 font-medium shadow-sm hover:bg-emerald-50 transition">
+            ← Início
+        </a>
+    </div>
+
+    <!-- Filtro -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-6">
+        <form th:action="@{/fechamento-status}" method="get">
+            <div class="w-full md:w-80">
+                <label class="block text-sm font-medium text-emerald-700 mb-2">
+                    Filtrar por Empresa
+                </label>
+                <select name="empresaId"
+                        onchange="this.form.submit()"
+                        class="w-full rounded-xl border border-emerald-200 px-4 py-3 focus:ring-2 focus:ring-emerald-500">
+                    <option value="">Todas as Empresas</option>
+                    <option th:each="empresa : ${empresas}"
+                            th:value="${empresa.id}"
+                            th:text="${empresa.nome}"
+                            th:selected="${empresaSelecionada != null and empresa.id == empresaSelecionada.id}">
+                    </option>
+                </select>
+            </div>
+        </form>
+    </div>
+
+    <!-- Tabela -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 overflow-x-auto">
+        <table class="w-full min-w-[1200px] text-sm">
+            <thead class="bg-emerald-100 text-emerald-800">
+            <tr>
+                <th class="px-6 py-4 text-left">Empresa</th>
+                <th class="px-6 py-4 text-left">Competência</th>
+                <th class="px-6 py-4 text-center">Fiscal</th>
+                <th class="px-6 py-4 text-center">FGTS</th>
+                <th class="px-6 py-4 text-center">INSS</th>
+                <th class="px-6 py-4 text-center">Simples</th>
+                <th class="px-6 py-4 text-center">Folha</th>
+                <th class="px-6 py-4 text-center">Atualização</th>
+                <th class="px-6 py-4 text-center">Ações</th>
+            </tr>
+            </thead>
+
+            <tbody class="divide-y divide-emerald-50">
+
+            <tr th:each="status : ${statusList}" class="hover:bg-emerald-50 transition">
+                <form th:action="@{/fechamento-status/atualizar}" method="post">
+                    <input type="hidden" name="id" th:value="${status.id}"/>
+
+                    <td class="px-6 py-4 font-medium text-gray-800"
+                        th:text="${status.empresa.nome}">
+                    </td>
+
+                    <td class="px-6 py-4 text-gray-600"
+                        th:text="${(status.competencia.mes < 10 ? '0' + status.competencia.mes : status.competencia.mes) + '/' + status.competencia.ano}">
+                    </td>
+
+                    <!-- CAMPOS STATUS -->
+                    <td class="px-6 py-4 text-center">
+                        <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
+                              th:text="${status.fiscalStatus}"
+                              th:classappend="${status.fiscalStatus.name() == 'CONCLUIDO'} ? ' bg-emerald-100 text-emerald-700' :
+                              (${status.fiscalStatus.name() == 'PENDENTE'} ? ' bg-amber-100 text-amber-700' :
+                              (${status.fiscalStatus.name() == 'EM_ANDAMENTO'} ? ' bg-sky-100 text-sky-700' :
+                              ' bg-red-100 text-red-700'))">
+                        </span>
+
+                        <select name="fiscalStatus"
+                                class="status-field hidden rounded-lg border border-emerald-200 px-2 py-1 text-xs">
+                            <option th:each="s : ${T(com.eleetricz.cashflow.entity.StatusTarefa).values()}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == status.fiscalStatus}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
+                              th:text="${status.fgtsStatus}"
+                              th:classappend="${status.fgtsStatus.name() == 'CONCLUIDO'} ? ' bg-emerald-100 text-emerald-700' :
+                              (${status.fgtsStatus.name() == 'PENDENTE'} ? ' bg-amber-100 text-amber-700' :
+                              (${status.fgtsStatus.name() == 'EM_ANDAMENTO'} ? ' bg-sky-100 text-sky-700' :
+                              ' bg-red-100 text-red-700'))">
+                        ></span>
+                        <select name="fgtsStatus" class="status-field hidden rounded-lg border border-emerald-200 px-2 py-1 text-xs">
+                            <option th:each="s : ${T(com.eleetricz.cashflow.entity.StatusTarefa).values()}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == status.fgtsStatus}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
+                              th:text="${status.inssStatus}"
+                              th:classappend="${status.inssStatus.name() == 'CONCLUIDO'} ? ' bg-emerald-100 text-emerald-700' :
+                              (${status.inssStatus.name() == 'PENDENTE'} ? ' bg-amber-100 text-amber-700' :
+                              (${status.inssStatus.name() == 'EM_ANDAMENTO'} ? ' bg-sky-100 text-sky-700' :
+                              ' bg-red-100 text-red-700'))">
+                        ></span>
+                        <select name="inssStatus" class="status-field hidden rounded-lg border border-emerald-200 px-2 py-1 text-xs">
+                            <option th:each="s : ${T(com.eleetricz.cashflow.entity.StatusTarefa).values()}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == status.inssStatus}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
+                              th:text="${status.simplesStatus}"
+                              th:classappend="${status.simplesStatus.name() == 'CONCLUIDO'} ? ' bg-emerald-100 text-emerald-700' :
+                              (${status.simplesStatus.name() == 'PENDENTE'} ? ' bg-amber-100 text-amber-700' :
+                              (${status.simplesStatus.name() == 'EM_ANDAMENTO'} ? ' bg-sky-100 text-sky-700' :
+                              ' bg-red-100 text-red-700'))">
+                        ></span>
+                        <select name="simplesStatus" class="status-field hidden rounded-lg border border-emerald-200 px-2 py-1 text-xs">
+                            <option th:each="s : ${T(com.eleetricz.cashflow.entity.StatusTarefa).values()}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == status.simplesStatus}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-6 py-4 text-center">
+                        <span class="status-badge px-3 py-1 rounded-full text-xs font-semibold"
+                              th:text="${status.folhaStatus}"
+                              th:classappend="${status.folhaStatus.name() == 'CONCLUIDO'} ? ' bg-emerald-100 text-emerald-700' :
+                              (${status.folhaStatus.name() == 'PENDENTE'} ? ' bg-amber-100 text-amber-700' :
+                              (${status.folhaStatus.name() == 'EM_ANDAMENTO'} ? ' bg-sky-100 text-sky-700' :
+                              ' bg-red-100 text-red-700'))">
+                        ></span>
+                        <select name="folhaStatus" class="status-field hidden rounded-lg border border-emerald-200 px-2 py-1 text-xs">
+                            <option th:each="s : ${T(com.eleetricz.cashflow.entity.StatusTarefa).values()}"
+                                    th:value="${s}"
+                                    th:text="${s}"
+                                    th:selected="${s == status.folhaStatus}">
+                            </option>
+                        </select>
+                    </td>
+
+                    <td class="px-6 py-4 text-center text-gray-500"
+                        th:text="${#temporals.format(status.ultimaAtualizacao, 'dd/MM/yyyy')}">
+                    </td>
+
+                    <!-- AÇÕES -->
+                    <td class="px-6 py-4 text-center">
+                        <div class="flex gap-2 justify-center">
+                            <button type="button"
+                                    onclick="editarOuSalvar(this)"
+                                    class="btn-editar px-3 py-1 rounded-lg bg-amber-500 text-white text-xs hover:bg-amber-600">
+                                Editar
+                            </button>
+
+                            <a th:href="@{/fechamento-status/excluir/{id}(id=${status.id})}"
+                               onclick="return confirm('Deseja realmente excluir?')"
+                               class="px-3 py-1 rounded-lg bg-red-500 text-white text-xs hover:bg-red-600">
+                                Excluir
+                            </a>
+                        </div>
+                    </td>
+                </form>
+            </tr>
+
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function editarOuSalvar(botao) {
+        const linha = botao.closest('tr');
+        const form = linha.querySelector('form');
+
+        const badges = linha.querySelectorAll('.status-badge');
+        const selects = linha.querySelectorAll('.status-field');
+
+        if (botao.innerText.trim() === 'Editar') {
+            badges.forEach(x => x.classList.add('hidden'));
+            selects.forEach(x => x.classList.remove('hidden'));
+
+            botao.innerText = 'Salvar';
+            botao.classList.remove('bg-amber-500', 'hover:bg-amber-600');
+            botao.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
+        } else {
+            form.submit();
+        }
+    }
+</script>
+
+</body>
+</html>
