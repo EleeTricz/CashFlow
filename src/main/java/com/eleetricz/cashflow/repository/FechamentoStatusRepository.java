@@ -22,4 +22,5 @@ public interface FechamentoStatusRepository extends JpaRepository<FechamentoStat
     Page<FechamentoStatus> findByFiltros(@Param("empresaId") Long empresaId,
                                          @Param("ano") Integer ano,
                                          Pageable pageable);
+    void deleteByEmpresa_Id(Long empresaId);
 }

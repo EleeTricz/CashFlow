@@ -17,4 +17,5 @@ public interface LancamentoFgtsRepository extends JpaRepository<LancamentoFgts, 
             String juros,
             String multa
     );
+    void deleteByEmpresa_Id(Long empresaId);
 }

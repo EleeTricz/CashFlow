@@ -6,11 +6,16 @@ import com.eleetricz.cashflow.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -204,5 +209,184 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
                             .build()
             );
         }
+    }
+
+    public int importarFgtsExtratoTxt(
+            MultipartFile arquivo,
+            Long empresaId
+    ) throws IOException {
+
+        Empresa empresa = empresaRepository.findById(empresaId)
+                .orElseThrow(() -> new IllegalStateException(
+                        "Empresa id=" + empresaId + " não existe"
+                ));
+
+        Usuario admin = usuarioRepository.findByNome("admin")
+                .orElseThrow(() -> new IllegalStateException(
+                        "Usuário admin não encontrado"
+                ));
+
+        Descricao descFgts = getOrCreateDescricao("FGTS");
+
+        String conteudo = new String(
+                arquivo.getBytes(),
+                StandardCharsets.UTF_8
+        );
+
+        Pattern pattern = Pattern.compile(
+                "(\\d{2}/\\d{2}/\\d{4})\\s+" +
+                        "DEPOSITO(?: EM ATRASO)?\\s+" +
+                        "([A-ZÇ]+)/(\\d{4})\\s+" +
+                        "([\\d.,]+)"
+        );
+
+        Matcher matcher = pattern.matcher(conteudo);
+
+        Map<String, BigDecimal> totaisPorCompetencia = new HashMap<>();
+        Map<String, LocalDate> dataPorCompetencia = new HashMap<>();
+
+        while (matcher.find()) {
+
+            LocalDate dataOcorrencia = LocalDate.parse(
+                    matcher.group(1),
+                    BR_DATE
+            );
+
+            String mesNome = matcher.group(2).trim();
+            String ano = matcher.group(3).trim();
+
+            String mesNumero = converterMes(mesNome);
+
+            if (mesNumero == null) {
+                continue;
+            }
+
+            String competenciaStr = mesNumero + "/" + ano;
+
+            if (isDepoisDeMarco2024(competenciaStr)) {
+                continue;
+            }
+
+            BigDecimal valor = new BigDecimal(
+                    matcher.group(4)
+                            .replace(".", "")
+                            .replace(",", ".")
+            );
+
+            totaisPorCompetencia.merge(
+                    competenciaStr,
+                    valor,
+                    BigDecimal::add
+            );
+
+            dataPorCompetencia.putIfAbsent(
+                    competenciaStr,
+                    dataOcorrencia
+            );
+        }
+
+        int inseridos = 0;
+        Set<String> competenciasProcessadas = new HashSet<>();
+
+        for (Map.Entry<String, BigDecimal> entry : totaisPorCompetencia.entrySet()) {
+
+            String competenciaStr = entry.getKey();
+            BigDecimal valor = entry.getValue();
+            LocalDate dataOcorrencia = dataPorCompetencia.get(competenciaStr);
+
+            Competencia competenciaReferida =
+                    getOrCreateCompetenciaFromService(
+                            competenciaStr,
+                            empresa
+                    );
+
+            String competenciaPagamentoStr =
+                    String.format("%02d/%d",
+                            dataOcorrencia.getMonthValue(),
+                            dataOcorrencia.getYear()
+                    );
+
+            Competencia competenciaPagamento =
+                    getOrCreateCompetenciaFromService(
+                            competenciaPagamentoStr,
+                            empresa
+                    );
+
+            boolean exists = lancamentoRepository
+                    .existsByEmpresaAndCompetenciaAndCompetenciaReferidaAndDescricaoAndValorAndDataOcorrenciaAndTipo(
+                            empresa,
+                            competenciaPagamento,
+                            competenciaReferida,
+                            descFgts,
+                            valor,
+                            dataOcorrencia,
+                            TipoLancamento.SAIDA
+                    );
+
+            if (!exists) {
+                lancamentoRepository.save(
+                        Lancamento.builder()
+                                .empresa(empresa)
+                                .competencia(competenciaPagamento)
+                                .competenciaReferida(competenciaReferida)
+                                .descricao(descFgts)
+                                .usuario(admin)
+                                .valor(valor)
+                                .dataOcorrencia(dataOcorrencia)
+                                .tipo(TipoLancamento.SAIDA)
+                                .build()
+                );
+
+                inseridos++;
+            }
+
+            competenciasProcessadas.add(competenciaStr);
+        }
+
+        for (String competenciaString : competenciasProcessadas) {
+            Competencia competencia = getOrCreateCompetenciaFromService(
+                    competenciaString,
+                    empresa
+            );
+
+            FechamentoStatus status = fechamentoStatusRepository
+                    .findByEmpresaAndCompetencia(empresa, competencia)
+                    .orElseGet(() -> FechamentoStatus.builder()
+                            .empresa(empresa)
+                            .competencia(competencia)
+                            .build());
+
+            status.setFgtsStatus(StatusTarefa.CONCLUIDO);
+            fechamentoStatusRepository.save(status);
+        }
+
+        return inseridos;
+    }
+
+    private String converterMes(String mesNome) {
+        return switch (mesNome.toUpperCase()) {
+            case "JANEIRO" -> "01";
+            case "FEVEREIRO" -> "02";
+            case "MARCO", "MARÇO" -> "03";
+            case "ABRIL" -> "04";
+            case "MAIO" -> "05";
+            case "JUNHO" -> "06";
+            case "JULHO" -> "07";
+            case "AGOSTO" -> "08";
+            case "SETEMBRO" -> "09";
+            case "OUTUBRO" -> "10";
+            case "NOVEMBRO" -> "11";
+            case "DEZEMBRO" -> "12";
+            default -> null;
+        };
+    }
+
+    private boolean isDepoisDeMarco2024(String competencia) {
+        String[] partes = competencia.split("/");
+
+        int mes = Integer.parseInt(partes[0]);
+        int ano = Integer.parseInt(partes[1]);
+
+        return ano > 2024 || (ano == 2024 && mes > 3);
     }
 }

@@ -19,7 +19,9 @@ public class EmpresaServiceImpl implements EmpresaService {
     private final LancamentoDasRepository lancDasRepo;
     private final LancamentoDaeRepository lancDaeRepo;
     private final LancamentoRepository lancRepo;
-
+    private final LancamentoFgtsRepository lancFgtsRepo;
+    private final FechamentoStatusRepository fechaStatusRepo;
+    private final CompetenciaRepository compRepo;
     @Override
     public Empresa salvar(Empresa empresa) {
         return empresaRepository.save(empresa);
@@ -48,9 +50,12 @@ public class EmpresaServiceImpl implements EmpresaService {
         for (var darf : darfs) {
             itensDarfRepo.deleteByLancamentoDarf_Id(darf.getId());
         }
+        lancFgtsRepo.deleteByEmpresa_Id(empresaId);
+        fechaStatusRepo.deleteByEmpresa_Id(empresaId);
         lancDarfRepo.deleteAll(darfs);
         lancDasRepo.deleteByEmpresaId_Id(empresaId);
         lancDaeRepo.deleteByEmpresa_Id(empresaId);
         lancRepo.deleteByEmpresaId(empresaId);
+        compRepo.deleteByEmpresa_Id(empresaId);
     }
 }

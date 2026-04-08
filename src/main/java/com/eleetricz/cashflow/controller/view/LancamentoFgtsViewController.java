@@ -8,10 +8,7 @@ import com.eleetricz.cashflow.service.LancamentoFgtsService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -30,13 +27,12 @@ public class LancamentoFgtsViewController {
 
     @GetMapping("/fgts")
     public String mostrarFormularioUpload(Model model) {
-        List<Empresa> empresas = empresaService.listarTodas();
-        model.addAttribute("empresas", empresas);
+        model.addAttribute("empresas", empresaService.listarTodas());
         return "fgts/upload";
     }
 
-    @PostMapping("/fgts/upload")
-    public String processarUpload(
+    @PostMapping("/fgts/upload-pdf")
+    public String processarUploadPdf(
             @RequestParam("empresaId") Long empresaId,
             @RequestParam("files") MultipartFile[] files,
             Model model
@@ -45,11 +41,8 @@ public class LancamentoFgtsViewController {
         List<File> tempFiles = new ArrayList<>();
 
         try {
-            if (files == null || files.length == 0) {
-                throw new IllegalArgumentException("Selecione ao menos um PDF de FGTS.");
-            }
-
             List<FgtsData> dadosExtraidos = new ArrayList<>();
+
             for (MultipartFile file : files) {
                 if (file == null || file.isEmpty()) {
                     continue;
@@ -59,17 +52,26 @@ public class LancamentoFgtsViewController {
                 file.transferTo(tempFile);
                 tempFiles.add(tempFile);
 
-                dadosExtraidos.addAll(pdfFgtsReader.extrairTodosDados(tempFile));
+                dadosExtraidos.addAll(
+                        pdfFgtsReader.extrairTodosDados(tempFile)
+                );
             }
 
-            inseridos = lancamentoFgtsService.importarDadosPdfFgts(empresaId, dadosExtraidos);
+            inseridos = lancamentoFgtsService
+                    .importarDadosPdfFgts(empresaId, dadosExtraidos);
+
             lancamentoFgtsService.importarTodos();
 
-            model.addAttribute("mensagem", "Upload concluído! Registros inseridos: " + inseridos);
-        } catch (IllegalArgumentException e) {
-            model.addAttribute("erro", e.getMessage());
+            model.addAttribute(
+                    "mensagem",
+                    "PDF importado com sucesso! Registros: " + inseridos
+            );
+
         } catch (Exception e) {
-            model.addAttribute("erro", "Erro ao processar o upload: " + e.getMessage());
+            model.addAttribute(
+                    "erro",
+                    "Erro ao importar PDF: " + e.getMessage()
+            );
         } finally {
             for (File tempFile : tempFiles) {
                 try {
@@ -77,6 +79,40 @@ public class LancamentoFgtsViewController {
                 } catch (Exception ignored) {
                 }
             }
+        }
+
+        model.addAttribute("empresas", empresaService.listarTodas());
+        return "fgts/upload";
+    }
+
+    @PostMapping("/fgts/upload-txt")
+    public String processarUploadTxt(
+            @RequestParam("empresaId") Long empresaId,
+            @RequestParam("files") MultipartFile[] files,
+            Model model
+    ) {
+        try {
+            int total = 0;
+
+            for (MultipartFile file : files) {
+                if (file == null || file.isEmpty()) {
+                    continue;
+                }
+
+                total += lancamentoFgtsService
+                        .importarFgtsExtratoTxt(file, empresaId);
+            }
+
+            model.addAttribute(
+                    "mensagem",
+                    "Extrato TXT importado com sucesso! Registros: " + total
+            );
+
+        } catch (Exception e) {
+            model.addAttribute(
+                    "erro",
+                    "Erro ao importar TXT: " + e.getMessage()
+            );
         }
 
         model.addAttribute("empresas", empresaService.listarTodas());
