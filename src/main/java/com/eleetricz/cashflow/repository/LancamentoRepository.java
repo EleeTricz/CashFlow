@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Set;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     List<Lancamento> findByEmpresa(Empresa empresa);
@@ -71,5 +72,16 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
     @Query("SELECT DISTINCT EXTRACT(YEAR FROM l.dataOcorrencia) FROM Lancamento l WHERE l.empresa.id = :empresaId ORDER BY 1 DESC")
     List<Integer> findAnosComLancamentos(@Param("empresaId") Long empresaId);
+
+    @Query("""
+        SELECT l.descricao.id
+        FROM Lancamento l
+        WHERE l.empresa.id = :empresaId
+          AND l.competencia.id = :competenciaId
+    """)
+    Set<Long> buscarDescricoesLancadas(
+            Long empresaId,
+            Long competenciaId
+    );
 
 }
