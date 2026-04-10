@@ -3,15 +3,12 @@ package com.eleetricz.cashflow.controller.view;
 import com.eleetricz.cashflow.dto.ReceitaCompraResumoDTO;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.relatorio.ExportadorLancamentosExcel;
-import com.eleetricz.cashflow.repository.CompetenciaRepository;
-import com.eleetricz.cashflow.repository.DescricaoRepository;
-import com.eleetricz.cashflow.repository.LancamentoRepository;
 import com.eleetricz.cashflow.service.*;
+import com.eleetricz.cashflow.service.fechamento.PendenciasPerfilService;
 import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -33,10 +30,7 @@ public class LancamentoViewController {
     @Autowired private CompetenciaService competenciaService;
     @Autowired private DescricaoService descricaoService;
     @Autowired private UsuarioService usuarioService;
-    @Autowired private LancamentoRepository lancamentoRepository;
-    @Autowired private DescricaoRepository descricaoRepository;
-    @Autowired private CompetenciaRepository competenciaRepository;
-    @Autowired private AuditoriaService auditoriaService;
+    @Autowired private PendenciasPerfilService pendenciasPerfilService;
 
 
 
@@ -87,7 +81,7 @@ public class LancamentoViewController {
 
         String compStr = competencia.getMes() + "-" + competencia.getAno();
 
-        List<LancamentoEsperado> pendencias = auditoriaService.verificarPendencias(empresaId, compStr);
+        var pendencias = pendenciasPerfilService.listarPendencias(empresaId, compStr);
 
         List<Competencia> competencias =
                 competenciaService.listarPorEmpresaCronologico(empresa);

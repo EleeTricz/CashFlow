@@ -2,7 +2,7 @@
 <html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Painel de Status de Fechamento</title>
+    <title>Status de Integração</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
@@ -14,22 +14,28 @@
     <div class="mb-8 flex items-start justify-between gap-4">
         <div>
             <h1 class="text-3xl font-bold text-emerald-800">
-                Painel de Fechamento Contábil
+                Status de Integração
             </h1>
             <p class="text-emerald-600 mt-1">
-                Acompanhe o andamento das competências por empresa
+                Acompanhe o andamento das integrações/importações por competência
             </p>
         </div>
 
-        <a th:href="@{/}"
-           class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-700 font-medium shadow-sm hover:bg-emerald-50 transition">
-            ← Início
-        </a>
+        <div class="flex gap-2">
+            <a th:href="@{/dashboard/fechamento}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 transition">
+                Dashboard
+            </a>
+            <a th:href="@{/}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-emerald-200 text-emerald-700 font-medium shadow-sm hover:bg-emerald-50 transition">
+                ← Início
+            </a>
+        </div>
     </div>
 
     <!-- Filtro -->
     <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-6">
-        <form th:action="@{/fechamento-status}" method="get" class="flex flex-col md:flex-row gap-4 items-end">
+        <form th:action="@{/status-integracao}" method="get" class="flex flex-col md:flex-row gap-4 items-end">
             <div class="w-full md:w-72">
                 <label class="block text-sm font-medium text-emerald-700 mb-2">Empresa</label>
                 <select name="empresaId" onchange="this.form.submit()" class="w-full rounded-xl border border-emerald-200 px-4 py-3 focus:ring-2 focus:ring-emerald-500 text-sm">
@@ -46,7 +52,7 @@
                 </select>
             </div>
 
-            <a th:href="@{/fechamento-status}" class="text-emerald-600 text-sm hover:underline pb-3">Limpar Filtros</a>
+            <a th:href="@{/status-integracao}" class="text-emerald-600 text-sm hover:underline pb-3">Limpar Filtros</a>
         </form>
     </div>
 
@@ -70,7 +76,7 @@
             <tbody class="divide-y divide-emerald-50">
 
             <tr th:each="status : ${statusList}" class="hover:bg-emerald-50 transition">
-                <form th:action="@{/fechamento-status/atualizar}" method="post">
+                <form th:action="@{/status-integracao/atualizar}" method="post">
                     <input type="hidden" name="id" th:value="${status.id}"/>
 
                     <td class="px-6 py-4 font-medium text-gray-800"
@@ -182,7 +188,7 @@
                                 Editar
                             </button>
 
-                            <a th:href="@{/fechamento-status/excluir/{id}(id=${status.id})}"
+                            <a th:href="@{/status-integracao/excluir/{id}(id=${status.id})}"
                                onclick="return confirm('Deseja realmente excluir?')"
                                class="px-3 py-1 rounded-lg bg-red-500 text-white text-xs hover:bg-red-600">
                                 Excluir
@@ -202,12 +208,12 @@
         </div>
 
         <div class="flex gap-1">
-            <a th:if="${pagina.hasPrevious()}"
-               th:href="@{/fechamento-status(page=${pagina.number - 1}, empresaId=${empresaSelecionadaId}, ano=${anoSelecionado})}"
+        <a th:if="${pagina.hasPrevious()}"
+               th:href="@{/status-integracao(page=${pagina.number - 1}, empresaId=${empresaSelecionadaId}, ano=${anoSelecionado})}"
                class="px-3 py-1 rounded-lg border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 text-sm">Anterior</a>
 
             <a th:if="${pagina.hasNext()}"
-               th:href="@{/fechamento-status(page=${pagina.number + 1}, empresaId=${empresaSelecionadaId}, ano=${anoSelecionado})}"
+               th:href="@{/status-integracao(page=${pagina.number + 1}, empresaId=${empresaSelecionadaId}, ano=${anoSelecionado})}"
                class="px-3 py-1 rounded-lg border border-emerald-200 bg-white text-emerald-700 hover:bg-emerald-50 text-sm">Próximo</a>
         </div>
     </div>

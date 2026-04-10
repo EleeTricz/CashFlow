@@ -4,6 +4,7 @@ import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
 import com.eleetricz.cashflow.service.LancamentoDarfServiceImpl;
 import com.eleetricz.cashflow.service.LancamentoDasServiceImpl;
+import com.eleetricz.cashflow.service.fechamento.FechamentoStatusService;
 import com.eleetricz.cashflow.taxconnect.dto.PagamentoNormalizadoDTO;
 import com.eleetricz.cashflow.util.Utils;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +25,7 @@ public class ImportacaoPagamentosService {
     private final EmpresaRepository empresaRepository;
     private final LancamentoDasServiceImpl lancamentoDasService;
     private final LancamentoDarfServiceImpl lancamentoDarfService;
-    private final FechamentoStatusRepository fechamentoStatusRepository;
-    private final CompetenciaRepository competenciaRepository;
+    private final FechamentoStatusService fechamentoStatusService;
 
     public void importar(Long empresaId, List<PagamentoNormalizadoDTO> pagamentos) {
 
@@ -153,36 +153,10 @@ public class ImportacaoPagamentosService {
     private void atualizarStatusCompetencia(
             Empresa empresa,
             String competenciaString,
-            java.util.function.Consumer<FechamentoStatus> updater
+            java.util.function.Consumer<StatusIntegracao> updater
     ) {
-        if (competenciaString == null || competenciaString.isBlank()) {
-            return;
-        }
-
-        String[] partes = competenciaString.split("/");
-        int mes = Integer.parseInt(partes[0]);
-        int ano = Integer.parseInt(partes[1]);
-
-        Competencia competencia = competenciaRepository
-                .findByMesAndAnoAndEmpresa(mes, ano, empresa)
-                .orElseGet(() -> competenciaRepository.save(
-                        Competencia.builder()
-                                .mes(mes)
-                                .ano(ano)
-                                .empresa(empresa)
-                                .build()
-                ));
-
-        FechamentoStatus status = fechamentoStatusRepository
-                .findByEmpresaAndCompetencia(empresa, competencia)
-                .orElseGet(() -> FechamentoStatus.builder()
-                        .empresa(empresa)
-                        .competencia(competencia)
-                        .build());
-
-        updater.accept(status);
-
-        fechamentoStatusRepository.save(status);
+        if (competenciaString == null || competenciaString.isBlank()) return;
+        fechamentoStatusService.atualizarStatus(empresa, competenciaString, updater);
     }
 }
 

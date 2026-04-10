@@ -1,9 +1,9 @@
 package com.eleetricz.cashflow.controller.view;
 
-import com.eleetricz.cashflow.entity.FechamentoStatus;
+import com.eleetricz.cashflow.entity.StatusIntegracao;
 import com.eleetricz.cashflow.entity.StatusTarefa;
 import com.eleetricz.cashflow.repository.EmpresaRepository;
-import com.eleetricz.cashflow.repository.FechamentoStatusRepository;
+import com.eleetricz.cashflow.repository.StatusIntegracaoRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,11 +17,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequestMapping("/fechamento-status")
+@RequestMapping({"/status-integracao", "/fechamento-status"})
 @RequiredArgsConstructor
-public class FechamentoStatusViewController {
+public class StatusIntegracaoViewController {
 
-    private final FechamentoStatusRepository fechamentoStatusRepository;
+    private final StatusIntegracaoRepository statusIntegracaoRepository;
     private final EmpresaRepository empresaRepository;
 
     @GetMapping
@@ -31,10 +31,8 @@ public class FechamentoStatusViewController {
             @PageableDefault(size = 20) Pageable pageable,
             Model model) {
 
-        // Busca paginada com filtros
-        Page<FechamentoStatus> pagina = fechamentoStatusRepository.findByFiltros(empresaId, ano, pageable);
+        Page<StatusIntegracao> pagina = statusIntegracaoRepository.findByFiltros(empresaId, ano, pageable);
 
-        // Gera lista dos últimos 5 anos (ex: 2026 até 2022)
         int anoAtual = LocalDate.now().getYear();
         List<Integer> ultimosAnos = new ArrayList<>();
         for (int i = 0; i < 5; i++) {
@@ -46,14 +44,15 @@ public class FechamentoStatusViewController {
         model.addAttribute("empresas", empresaRepository.findAll());
         model.addAttribute("ultimosAnos", ultimosAnos);
 
-        // Mantém os filtros no Model para o HTML saber o que está selecionado
         model.addAttribute("empresaSelecionadaId", empresaId);
         model.addAttribute("anoSelecionado", ano);
 
+        // Mantemos o template antigo por compatibilidade, apenas com labels renomeados.
         return "fechamento-status/panel";
     }
 
     @PostMapping("/atualizar")
+    @SuppressWarnings("null")
     public String atualizarStatus(
             @RequestParam Long id,
             @RequestParam StatusTarefa fiscalStatus,
@@ -62,20 +61,22 @@ public class FechamentoStatusViewController {
             @RequestParam StatusTarefa simplesStatus,
             @RequestParam StatusTarefa folhaStatus
     ) {
-        FechamentoStatus status = fechamentoStatusRepository.findById(id).orElseThrow();
+        StatusIntegracao status = statusIntegracaoRepository.findById(id).orElseThrow();
         status.setFiscalStatus(fiscalStatus);
         status.setFgtsStatus(fgtsStatus);
         status.setInssStatus(inssStatus);
         status.setSimplesStatus(simplesStatus);
         status.setFolhaStatus(folhaStatus);
-        fechamentoStatusRepository.save(status);
+        statusIntegracaoRepository.save(status);
 
-        return "redirect:/fechamento-status";
+        return "redirect:/status-integracao";
     }
 
     @GetMapping("/excluir/{id}")
+    @SuppressWarnings("null")
     public String excluir(@PathVariable Long id) {
-        fechamentoStatusRepository.deleteById(id);
-        return "redirect:/fechamento-status";
+        statusIntegracaoRepository.deleteById(id);
+        return "redirect:/status-integracao";
     }
 }
+

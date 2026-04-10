@@ -16,8 +16,15 @@
                 Painel de Fechamento
             </h1>
 
-            <div class="text-sm text-gray-500">
-                Progresso: <span th:text="${percentual}"></span>%
+            <div class="flex items-center gap-4">
+                <a th:href="@{/dashboard/fechamento}"
+                   class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white font-medium shadow-sm hover:bg-emerald-700 transition text-sm">
+                    Dashboard
+                </a>
+
+                <div class="text-sm text-gray-500">
+                    Progresso: <span th:text="${percentual}"></span>%
+                </div>
             </div>
         </div>
 

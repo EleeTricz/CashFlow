@@ -8,45 +8,29 @@ import com.eleetricz.cashflow.entity.FechamentoItemEsperado;
 import com.eleetricz.cashflow.repository.DescricaoRepository;
 import com.eleetricz.cashflow.repository.EmpresaRepository;
 import com.eleetricz.cashflow.repository.FechamentoItemEsperadoRepository;
-import com.eleetricz.cashflow.repository.LancamentoRepository;
+import com.eleetricz.cashflow.service.fechamento.FechamentoCentralService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Set;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
 public class PainelFechamentoServiceImpl implements PainelFechamentoService{
 
-    private final LancamentoRepository lancamentoRepository;
     private final FechamentoItemEsperadoRepository itemRepository;
     private final EmpresaRepository empresaRepository;
     private final DescricaoRepository descricaoRepository;
+    private final FechamentoCentralService fechamentoCentralService;
 
     public List<PainelFechamentoDTO> gerarPainel(
             Long empresaId,
             Long competenciaId
     ) {
-
-        Set<Long> descricoesLancadas =
-                lancamentoRepository.buscarDescricoesLancadas(
-                        empresaId,
-                        competenciaId
-                );
-
-        List<FechamentoItemEsperado> esperados =
-                itemRepository.findByEmpresaId(empresaId);
-
-        return esperados.stream()
-                .map(item -> new PainelFechamentoDTO(
-                        item.getDescricao().getNome(),
-                        descricoesLancadas.contains(
-                                item.getDescricao().getId()
-                        ) ? "CONCLUÍDO" : "PENDENTE"
-                ))
-                .toList();
+        // Delegado para o núcleo central de fechamento (mantém comportamento atual da tela).
+        return fechamentoCentralService.gerarPainelPerfilEsperado(empresaId, competenciaId);
     }
 
     public Integer calcularPercentual(
@@ -63,26 +47,27 @@ public class PainelFechamentoServiceImpl implements PainelFechamentoService{
     }
 
     @Transactional
+    @SuppressWarnings("null")
     public void salvarPerfil(PerfilFechamentoFormDTO dto) {
 
-        if (dto.getEmpresaId() == null) {
-            throw new IllegalArgumentException(
-                    "Empresa não informada no formulário."
-            );
-        }
+        Long empresaId = Objects.requireNonNull(
+                dto.getEmpresaId(),
+                "Empresa não informada no formulário."
+        );
 
         Empresa empresa = empresaRepository
-                .findById(dto.getEmpresaId())
+                .findById(empresaId)
                 .orElseThrow(() ->
                         new RuntimeException("Empresa não encontrada.")
                 );
 
         itemRepository.deleteByEmpresaId(empresa.getId());
 
-        List<Descricao> descricoes =
-                descricaoRepository.findAllById(
-                        dto.getDescricoesSelecionadas()
-                );
+        List<Long> descricoesSelecionadas = Objects.requireNonNullElse(dto.getDescricoesSelecionadas(), List.<Long>of())
+                .stream()
+                .filter(Objects::nonNull)
+                .toList();
+        List<Descricao> descricoes = descricaoRepository.findAllById(descricoesSelecionadas);
 
         List<FechamentoItemEsperado> itens =
                 descricoes.stream()

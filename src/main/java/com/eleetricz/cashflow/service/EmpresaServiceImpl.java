@@ -4,7 +4,6 @@ import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.entity.Usuario;
 import com.eleetricz.cashflow.repository.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +19,10 @@ public class EmpresaServiceImpl implements EmpresaService {
     private final LancamentoDaeRepository lancDaeRepo;
     private final LancamentoRepository lancRepo;
     private final LancamentoFgtsRepository lancFgtsRepo;
-    private final FechamentoStatusRepository fechaStatusRepo;
+    private final StatusIntegracaoRepository statusIntegracaoRepository;
     private final CompetenciaRepository compRepo;
     @Override
+    @SuppressWarnings("null")
     public Empresa salvar(Empresa empresa) {
         return empresaRepository.save(empresa);
     }
@@ -38,12 +38,14 @@ public class EmpresaServiceImpl implements EmpresaService {
     }
 
     @Override
+    @SuppressWarnings("null")
     public Empresa buscarPorId(Long id) {
         return empresaRepository.findById(id).orElse(null);
     }
 
     @Transactional
     @Override
+    @SuppressWarnings("null")
     public void zerarLancamentos(Long empresaId) {
         // Deletar ItensDarf antes de LancamentoDarf (por FK)
         var darfs = lancDarfRepo.findByEmpresaId(empresaId);
@@ -51,7 +53,7 @@ public class EmpresaServiceImpl implements EmpresaService {
             itensDarfRepo.deleteByLancamentoDarf_Id(darf.getId());
         }
         lancFgtsRepo.deleteByEmpresa_Id(empresaId);
-        fechaStatusRepo.deleteByEmpresa_Id(empresaId);
+        statusIntegracaoRepository.deleteByEmpresa_Id(empresaId);
         lancDarfRepo.deleteAll(darfs);
         lancDasRepo.deleteByEmpresaId_Id(empresaId);
         lancDaeRepo.deleteByEmpresa_Id(empresaId);

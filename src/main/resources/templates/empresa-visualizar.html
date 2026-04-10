@@ -81,11 +81,11 @@
                 Gerenciar Parcelamentos
             </a>
 
-            <!-- Gerenciar Lançamentos Esperados -->
-            <a th:href="@{'/lancamentos-esperadostf/empresa/' + ${empresa.id}}"
+            <!-- Perfil da Empresa (itens esperados) -->
+            <a th:href="@{'/fechamento/perfil/' + ${empresa.id}}"
                class="inline-flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition text-sm shadow">
-                <i data-lucide="calendar" class="w-5 h-5"></i>
-                Gerenciar Lançamentos Esperados
+                <i data-lucide="clipboard-list" class="w-5 h-5"></i>
+                Perfil da Empresa
             </a>
         </div>
     </div>

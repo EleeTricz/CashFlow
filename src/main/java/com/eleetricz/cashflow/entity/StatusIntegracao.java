@@ -10,12 +10,13 @@ import lombok.Setter;
 import java.time.LocalDate;
 
 @Entity
+@Table(name = "fechamento_status")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class FechamentoStatus {
+public class StatusIntegracao {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +28,7 @@ public class FechamentoStatus {
 
     @ManyToOne
     @JoinColumn(name = "competenci-id", nullable = false)
-    private Competencia competencia; // Competência que está sendo fechada (ex: 03/2026)
+    private Competencia competencia;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -49,7 +50,7 @@ public class FechamentoStatus {
     @Column(nullable = false)
     private StatusTarefa folhaStatus;
 
-    private LocalDate ultimaAtualizacao; // Para saber quando o status foi modificado pela última vez
+    private LocalDate ultimaAtualizacao;
 
     @PrePersist
     @PreUpdate
@@ -62,3 +63,4 @@ public class FechamentoStatus {
         this.ultimaAtualizacao = LocalDate.now();
     }
 }
+

@@ -3,6 +3,7 @@ package com.eleetricz.cashflow.service;
 import com.eleetricz.cashflow.dto.FgtsData;
 import com.eleetricz.cashflow.entity.*;
 import com.eleetricz.cashflow.repository.*;
+import com.eleetricz.cashflow.service.fechamento.FechamentoStatusService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -27,7 +28,7 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
     private final DescricaoRepository descricaoRepository;
     private final CompetenciaRepository competenciaRepository;
     private final LancamentoRepository lancamentoRepository;
-    private final FechamentoStatusRepository fechamentoStatusRepository;
+    private final FechamentoStatusService fechamentoStatusService;
 
     private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
 
@@ -83,17 +84,11 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
         }
 
         for (String competenciaString : competenciasProcessadas) {
-            Competencia competencia = getOrCreateCompetenciaFromService(competenciaString, empresa);
-
-            FechamentoStatus status = fechamentoStatusRepository
-                    .findByEmpresaAndCompetencia(empresa, competencia)
-                    .orElseGet(() -> FechamentoStatus.builder()
-                            .empresa(empresa)
-                            .competencia(competencia)
-                            .build());
-
-            status.setFgtsStatus(StatusTarefa.CONCLUIDO);
-            fechamentoStatusRepository.save(status);
+            fechamentoStatusService.marcarConcluido(
+                    empresa,
+                    competenciaString,
+                    s -> s.setFgtsStatus(StatusTarefa.CONCLUIDO)
+            );
         }
 
         return inseridos;
@@ -344,20 +339,11 @@ public class LancamentoFgtsServiceImpl implements LancamentoFgtsService {
         }
 
         for (String competenciaString : competenciasProcessadas) {
-            Competencia competencia = getOrCreateCompetenciaFromService(
+            fechamentoStatusService.marcarConcluido(
+                    empresa,
                     competenciaString,
-                    empresa
+                    s -> s.setFgtsStatus(StatusTarefa.CONCLUIDO)
             );
-
-            FechamentoStatus status = fechamentoStatusRepository
-                    .findByEmpresaAndCompetencia(empresa, competencia)
-                    .orElseGet(() -> FechamentoStatus.builder()
-                            .empresa(empresa)
-                            .competencia(competencia)
-                            .build());
-
-            status.setFgtsStatus(StatusTarefa.CONCLUIDO);
-            fechamentoStatusRepository.save(status);
         }
 
         return inseridos;
