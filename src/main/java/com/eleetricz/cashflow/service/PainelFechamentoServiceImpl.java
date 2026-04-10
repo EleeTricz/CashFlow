@@ -38,12 +38,14 @@ public class PainelFechamentoServiceImpl implements PainelFechamentoService{
     ) {
         long total = painel.size();
 
-        long concluidos = painel.stream()
-                .filter(p -> p.getStatus().equals("CONCLUÍDO"))
+        long completos = painel.stream()
+                .filter(p -> "CONCLUÍDO".equals(p.getStatus())
+                        || "IGNORADO".equals(p.getStatus())
+                        || "DISPENSADO".equals(p.getStatus()))
                 .count();
 
         return total == 0 ? 0 :
-                (int) ((concluidos * 100) / total);
+                (int) ((completos * 100) / total);
     }
 
     @Transactional

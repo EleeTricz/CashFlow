@@ -7,6 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 public class PainelFechamentoDTO {
 
+    private Long descricaoId;
     private String descricao;
     private String status;
 }

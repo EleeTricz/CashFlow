@@ -99,8 +99,12 @@ public class DashboardFechamentoViewController {
 
     private int calcularPercentual(List<PainelFechamentoDTO> painel) {
         if (painel == null || painel.isEmpty()) return 0;
-        long concluidos = painel.stream().filter(p -> "CONCLUÍDO".equals(p.getStatus())).count();
-        return (int) ((concluidos * 100) / painel.size());
+        long completos = painel.stream()
+                .filter(p -> "CONCLUÍDO".equals(p.getStatus())
+                        || "IGNORADO".equals(p.getStatus())
+                        || "DISPENSADO".equals(p.getStatus()))
+                .count();
+        return (int) ((completos * 100) / painel.size());
     }
 }
 

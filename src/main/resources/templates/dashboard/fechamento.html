@@ -15,7 +15,7 @@
         <div>
             <h1 class="text-3xl font-bold text-emerald-800">Dashboard de Integração</h1>
             <p class="text-emerald-600 mt-1">
-                Visão única: status de integração e perfil da empresa.
+                Visão única: Status de integração e perfil da empresa.
             </p>
         </div>
 
@@ -91,7 +91,7 @@
                     <p class="text-sm text-emerald-600" th:text="${competenciaLabel}"></p>
                 </div>
                 <a th:href="@{/fechamento-status}"
-                   class="text-sm text-emerald-700 hover:underline">abrir</a>
+                   class="text-sm text-emerald-700 hover:underline">Abrir</a>
             </div>
 
             <div th:if="${fechamentoStatus == null}"
@@ -162,7 +162,7 @@
                     </p>
                 </div>
                 <a th:href="@{/fechamento/perfil/{empresaId}(empresaId=${empresaSelecionadaId})}"
-                   class="text-sm text-emerald-700 hover:underline">configurar</a>
+                   class="text-sm text-emerald-700 hover:underline">Configurar</a>
             </div>
 
             <div class="w-full bg-emerald-100 rounded-full h-3">
@@ -195,6 +195,10 @@
                                   class="px-3 py-1 rounded-full text-xs bg-amber-100 text-amber-700 font-semibold">
                                 PENDENTE
                             </span>
+                            <span th:if="${item.status == 'IGNORADO' || item.status == 'DISPENSADO'}"
+                                  class="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700 font-semibold">
+                                IGNORADO/DISPENSADO
+                            </span>
                         </td>
                     </tr>
                     </tbody>
@@ -213,7 +217,7 @@
                 </div>
                 <div class="flex gap-3">
                     <a th:href="@{/auditoriatf/empresa/{empresaId}/{competencia}(empresaId=${empresaSelecionadaId},competencia=${competenciaKey})}"
-                       class="text-sm text-emerald-700 hover:underline">abrir auditoria</a>
+                       class="text-sm text-emerald-700 hover:underline">Abrir auditoria</a>
                 </div>
             </div>
 
