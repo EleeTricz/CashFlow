@@ -4,7 +4,7 @@ import com.eleetricz.cashflow.dto.DarfData;
 import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.pdfReader.PdfDarfReader;
 import com.eleetricz.cashflow.service.EmpresaService;
-import com.eleetricz.cashflow.service.LancamentoDarfService;
+import com.eleetricz.cashflow.service.DocumentoFiscalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -23,7 +23,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LancamentoDarfViewController {
     private final EmpresaService empresaService;
-    private final LancamentoDarfService lancamentoDarfService;
+    private final DocumentoFiscalService documentoFiscalService;
     private final PdfDarfReader pdfDarfReader;
 
     @GetMapping("darf")
@@ -44,10 +44,10 @@ public class LancamentoDarfViewController {
             file.transferTo(tempFile);
 
             List<DarfData> dadosExtraidos = pdfDarfReader.extrairTodosDados(tempFile);
-            int inseridos = lancamentoDarfService.importarDadosPdfDarf(empresaId, dadosExtraidos);
+            int inseridos = documentoFiscalService.importarDadosPdfDarf(empresaId, dadosExtraidos);
             Files.deleteIfExists(tempFile.toPath());
 
-            lancamentoDarfService.importarTodos();
+            documentoFiscalService.importarTodos();
             model.addAttribute("mensagem", "Upload concluído! Registros inseridos: " + inseridos);
         }catch (IllegalArgumentException e) {
             model.addAttribute("erro", e.getMessage());

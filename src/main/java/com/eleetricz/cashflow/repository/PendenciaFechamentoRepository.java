@@ -19,4 +19,7 @@ public interface PendenciaFechamentoRepository
             Long competenciaId,
             Long descricaoId
     );
+
+    void deleteByCompetencia_Empresa_Id(Long empresaId);
+
 }

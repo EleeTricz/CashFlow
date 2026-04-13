@@ -2,10 +2,9 @@ package com.eleetricz.cashflow.controller.view;
 
 import com.eleetricz.cashflow.dto.DasData;
 import com.eleetricz.cashflow.entity.Empresa;
-import com.eleetricz.cashflow.entity.LancamentoDas;
 import com.eleetricz.cashflow.pdfReader.PdfDasReader;
 import com.eleetricz.cashflow.service.EmpresaService;
-import com.eleetricz.cashflow.service.LancamentoDasService;
+import com.eleetricz.cashflow.service.DocumentoFiscalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -27,7 +26,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class LancamentoDasViewController {
     private final EmpresaService empresaService;
-    private final LancamentoDasService dasService;
+    private final DocumentoFiscalService documentoFiscalService;
     private final PdfDasReader pdfDasReader;
 
     private static final DateTimeFormatter BR_DATE = DateTimeFormatter.ofPattern("dd/MM/yyyy");
@@ -52,13 +51,13 @@ public class LancamentoDasViewController {
             int inseridos = 0;
             List<DasData> dadosExtraidos = pdfDasReader.extrairTodosDados(tempFile);
 
-            inseridos = dasService.importarDadosPdfDas(empresaId, dadosExtraidos);
+            inseridos = documentoFiscalService.importarDadosPdfDas(empresaId, dadosExtraidos);
 
 
             Files.deleteIfExists(tempFile.toPath());
 
             // ✅ Chamada automática da importação
-            dasService.importarTodos();
+            documentoFiscalService.importarTodos();
 
 
             model.addAttribute("mensagem", "Upload concluído! Registros inseridos: " + inseridos);

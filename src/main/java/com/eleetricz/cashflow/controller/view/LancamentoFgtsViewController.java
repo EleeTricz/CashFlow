@@ -4,7 +4,7 @@ import com.eleetricz.cashflow.dto.FgtsData;
 import com.eleetricz.cashflow.entity.Empresa;
 import com.eleetricz.cashflow.pdfReader.PdfFgtsReader;
 import com.eleetricz.cashflow.service.EmpresaService;
-import com.eleetricz.cashflow.service.LancamentoFgtsService;
+import com.eleetricz.cashflow.service.DocumentoFiscalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -22,7 +22,7 @@ import java.util.List;
 public class LancamentoFgtsViewController {
 
     private final EmpresaService empresaService;
-    private final LancamentoFgtsService lancamentoFgtsService;
+    private final DocumentoFiscalService documentoFiscalService;
     private final PdfFgtsReader pdfFgtsReader;
 
     @GetMapping("/fgts")
@@ -57,10 +57,10 @@ public class LancamentoFgtsViewController {
                 );
             }
 
-            inseridos = lancamentoFgtsService
+            inseridos = documentoFiscalService
                     .importarDadosPdfFgts(empresaId, dadosExtraidos);
 
-            lancamentoFgtsService.importarTodos();
+            documentoFiscalService.importarTodos();
 
             model.addAttribute(
                     "mensagem",
@@ -99,7 +99,7 @@ public class LancamentoFgtsViewController {
                     continue;
                 }
 
-                total += lancamentoFgtsService
+                total += documentoFiscalService
                         .importarFgtsExtratoTxt(file, empresaId);
             }
 

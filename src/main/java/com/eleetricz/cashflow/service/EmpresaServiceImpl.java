@@ -21,6 +21,8 @@ public class EmpresaServiceImpl implements EmpresaService {
     private final LancamentoFgtsRepository lancFgtsRepo;
     private final StatusIntegracaoRepository statusIntegracaoRepository;
     private final CompetenciaRepository compRepo;
+    private final PendenciaFechamentoRepository pendenciaFechamentoRepository;
+
     @Override
     @SuppressWarnings("null")
     public Empresa salvar(Empresa empresa) {
@@ -47,17 +49,19 @@ public class EmpresaServiceImpl implements EmpresaService {
     @Override
     @SuppressWarnings("null")
     public void zerarLancamentos(Long empresaId) {
-        // Deletar ItensDarf antes de LancamentoDarf (por FK)
+        // Deletar itens DARF antes do DARF
         var darfs = lancDarfRepo.findByEmpresaId(empresaId);
         for (var darf : darfs) {
             itensDarfRepo.deleteByLancamentoDarf_Id(darf.getId());
         }
+
         lancFgtsRepo.deleteByEmpresa_Id(empresaId);
         statusIntegracaoRepository.deleteByEmpresa_Id(empresaId);
         lancDarfRepo.deleteAll(darfs);
         lancDasRepo.deleteByEmpresaId_Id(empresaId);
         lancDaeRepo.deleteByEmpresa_Id(empresaId);
         lancRepo.deleteByEmpresaId(empresaId);
+        pendenciaFechamentoRepository.deleteByCompetencia_Empresa_Id(empresaId);
         compRepo.deleteByEmpresa_Id(empresaId);
     }
 }

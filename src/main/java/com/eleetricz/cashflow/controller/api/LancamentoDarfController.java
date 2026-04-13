@@ -1,6 +1,6 @@
 package com.eleetricz.cashflow.controller.api;
 
-import com.eleetricz.cashflow.service.LancamentoDarfService;
+import com.eleetricz.cashflow.service.DocumentoFiscalService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -9,11 +9,11 @@ import org.springframework.web.bind.annotation.*;
 @RequiredArgsConstructor
 public class LancamentoDarfController {
 
-    private final LancamentoDarfService darfService;
+    private final DocumentoFiscalService documentoFiscalService;
 
     @GetMapping("/importar")
     public String importarDarf() {
-        darfService.importarTodos();
+        documentoFiscalService.importarTodos();
         return "Importação de DARF concluída!";
     }
 }
