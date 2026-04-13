@@ -5,28 +5,55 @@
     <title>Exportar - Lançamentos</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="bg-green-50 min-h-screen flex flex-col items-center justify-center font-sans">
+<body class="bg-emerald-50 min-h-screen font-sans">
 
-<!-- Cabeçalho -->
-<div class="mb-10 text-center">
-    <h1 class="text-3xl font-bold text-green-700">Exportar Lançamentos</h1>
-    <p class="text-green-600 mt-2">Exporte os lançamentos financeiros para integração com o Questor</p>
-</div>
+<div class="container mx-auto px-4 md:px-8 py-8">
+
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <span>Exportar</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-800">
+                    Exportar Lançamentos
+                </h1>
+                <p class="text-emerald-600 mt-1 text-sm">Exporte os lançamentos financeiros para integração com o Questor</p>
+            </div>
+            <a href="/"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Início
+            </a>
+        </div>
+    </div>
 
 <!-- Botão de exportação -->
-<div class="grid grid-cols-1 gap-6">
-    <a href="/exportacaotf/txt" class="bg-white hover:bg-green-100 border border-green-300 p-6 rounded-2xl shadow-lg text-center w-72">
-        <div class="text-4xl mb-2">📤</div>
-        <div class="text-lg font-semibold text-green-800">Exportar TXT</div>
-        <p class="text-sm text-green-600 mt-1">Gerar arquivo para importação no Questor</p>
+<div class="max-w-md mx-auto">
+    <a href="/exportacaotf/txt" class="group block bg-white hover:bg-emerald-50 border border-emerald-200 p-8 rounded-2xl shadow-lg shadow-emerald-100/50 text-center transition-all duration-300 hover:-translate-y-1">
+        <div class="inline-flex items-center justify-center w-16 h-16 bg-emerald-100 rounded-2xl mb-4 group-hover:bg-emerald-200 transition">
+            <i data-lucide="upload" class="w-8 h-8 text-emerald-700"></i>
+        </div>
+        <div class="text-xl font-bold text-gray-900 mb-2">Exportar TXT</div>
+        <p class="text-sm text-gray-500">Gerar arquivo para importação no Questor</p>
     </a>
 </div>
 
-<!-- Voltar -->
-<div class="mt-12">
-    <a href="/" class="text-green-600 hover:underline">← Voltar para a página inicial</a>
 </div>
+
+<script>
+    lucide.createIcons();
+</script>
 
 </body>
 </html>

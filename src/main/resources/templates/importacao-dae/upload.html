@@ -5,60 +5,93 @@
     <title>Importar DAE</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 px-4 py-10">
+<body class="min-h-screen bg-emerald-50 font-sans">
 
-<div class="max-w-2xl mx-auto bg-white/95 border border-green-200 p-8 md:p-10 rounded-3xl shadow-xl">
-
-    <div class="mb-8 text-center">
-        <p class="text-sm font-medium text-green-600 uppercase tracking-wide">Importacao</p>
-        <h1 class="text-3xl font-bold text-green-800 mt-1">Importar Planilha DAE</h1>
-        <p class="text-green-700 mt-2">Selecione a empresa de destino e envie o arquivo para pre-visualizar os lancamentos.</p>
-    </div>
-
-    <div th:if="${mensagem}"
-         class="mb-6 bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-xl">
-        <span th:text="${mensagem}"></span>
-    </div>
-
-    <form method="post"
-          enctype="multipart/form-data"
-          th:action="@{/importacao-dae/preview}"
-          class="space-y-5">
-
-        <div>
-            <label class="block mb-2 text-sm font-semibold text-green-800">Empresa</label>
-            <select name="empresaId"
-                    required
-                    class="w-full border border-green-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-green-500 bg-white">
-            <option value="">Selecione</option>
-            <option th:each="empresa : ${empresas}"
-                    th:value="${empresa.id}"
-                    th:text="${empresa.nome}"></option>
-            </select>
-        </div>
-
-        <div>
-            <label class="block mb-2 text-sm font-semibold text-green-800">Arquivo DAE (.xlsx ou .xls)</label>
-            <input type="file"
-                   name="arquivo"
-                   accept=".xlsx,.xls"
-                   required
-                   class="w-full border border-dashed border-green-300 rounded-xl px-4 py-3 bg-green-50">
-        </div>
-
-        <div class="flex flex-col sm:flex-row gap-3 pt-2">
-            <button type="submit"
-                    class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition">
-                Pre-visualizar
-            </button>
+<div class="container mx-auto px-4 md:px-8 py-8">
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <a href="/importartf/todas" class="hover:underline">Importações</a>
+                    <span>/</span>
+                    <span>DAE</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-800">
+                    Importar Planilha DAE
+                </h1>
+                <p class="text-emerald-600 mt-1 text-sm">Selecione a empresa de destino e envie o arquivo para pré-visualizar.</p>
+            </div>
             <a href="/importartf/todas"
-               class="bg-white hover:bg-green-50 text-green-700 border border-green-300 font-semibold px-6 py-3 rounded-xl transition text-center">
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 Voltar
             </a>
         </div>
-    </form>
+    </div>
+
+    <div class="max-w-2xl mx-auto bg-white rounded-2xl shadow-lg border border-emerald-100 p-8 md:p-10">
+
+        <div th:if="${mensagem}"
+             class="mb-6 flex items-center gap-2 bg-emerald-100 border border-emerald-300 text-emerald-800 px-4 py-3 rounded-xl">
+            <i data-lucide="check-circle" class="w-5 h-5"></i>
+            <span th:text="${mensagem}"></span>
+        </div>
+
+        <form method="post"
+              enctype="multipart/form-data"
+              th:action="@{/importacao-dae/preview}"
+              class="space-y-5">
+
+            <div>
+                <label class="block mb-2 text-sm font-semibold text-emerald-800">Empresa</label>
+                <select name="empresaId"
+                        required
+                        class="w-full border border-emerald-300 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-emerald-500 bg-white">
+                    <option value="">Selecione</option>
+                    <option th:each="empresa : ${empresas}"
+                            th:value="${empresa.id}"
+                            th:text="${empresa.nome}"></option>
+                </select>
+            </div>
+
+            <div>
+                <label class="block mb-2 text-sm font-semibold text-emerald-800">Arquivo DAE (.xlsx ou .xls)</label>
+                <input type="file"
+                       name="arquivo"
+                       accept=".xlsx,.xls"
+                       required
+                       class="w-full border border-dashed border-emerald-300 rounded-xl px-4 py-3 bg-emerald-50">
+            </div>
+
+            <div class="flex flex-col sm:flex-row gap-3 pt-2">
+                <button type="submit"
+                        class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition">
+                    <i data-lucide="eye" class="w-5 h-5"></i>
+                    Pré-visualizar
+                </button>
+                <a href="/importartf/todas"
+                   class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-semibold px-6 py-3 rounded-xl transition text-center">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                    Voltar
+                </a>
+            </div>
+        </form>
+    </div>
+
 </div>
 
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

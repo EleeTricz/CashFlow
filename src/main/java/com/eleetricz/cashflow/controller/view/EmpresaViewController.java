@@ -33,7 +33,10 @@ public class EmpresaViewController {
     @GetMapping("/usuario")
     public String listarPorUsuario(@RequestParam("usuarioId") Long usuarioId, Model model) {
         Usuario usuario = usuarioService.buscarPorId(usuarioId);
-        List<Empresa> empresas = empresaService.listarPorUsuario(usuario);
+        List<Empresa> empresas = empresaService.listarPorUsuario(usuario)
+                .stream()
+                .sorted(Comparator.comparing(Empresa::getNome, String.CASE_INSENSITIVE_ORDER))
+                .toList();;
         model.addAttribute("empresas", empresas);
         model.addAttribute("usuarios", usuarioService.listarTodos());
         return "painel";

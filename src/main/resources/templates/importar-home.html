@@ -5,14 +5,36 @@
     <title>Importar - Tipos de Arquivo</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="bg-gradient-to-b from-green-50 to-emerald-100 min-h-screen flex flex-col items-center justify-center font-sans">
+<body class="bg-gradient-to-b from-green-50 to-emerald-100 min-h-screen font-sans">
 
-<!-- Cabeçalho -->
-<div class="mb-10 text-center">
-    <h1 class="text-3xl font-bold text-green-700">Importar Documentos</h1>
-    <p class="text-green-600 mt-2">Escolha o tipo de arquivo que deseja importar</p>
-</div>
+<div class="container mx-auto px-4 md:px-8 py-8">
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <span>Importações</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-800">
+                    Importar Documentos
+                </h1>
+                <p class="text-emerald-600 mt-1 text-sm">Escolha o tipo de arquivo que deseja importar</p>
+            </div>
+            <a href="/" class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                Início
+            </a>
+        </div>
+    </div>
 
 <!-- Botões de escolha -->
 <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -84,12 +106,12 @@
         </p>
     </a>
 
+    </div>
+
 </div>
 
-<!-- Voltar -->
-<div class="mt-12">
-    <a href="/" class="text-green-600 hover:underline">← Voltar para a página inicial</a>
-</div>
-
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

@@ -2,72 +2,93 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Sistema de Caixa</title>
+    <title>Empresas - CashFlow</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Definindo a paleta de verdes */
-        :root {
-            --green-1: #00b37e;  /* Verde vibrante */
-            --green-2: #00875f;  /* Verde médio */
-            --green-3: #2e8b57;  /* Verde mais escuro */
-            --gray-1: #f4f4f5;  /* Cinza suave */
-            --gray-2: #d1d5db;  /* Cinza mais escuro */
-        }
-    </style>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="bg-green-50 min-h-screen flex flex-col items-center justify-center font-sans">
+<body class="bg-emerald-50 min-h-screen font-sans">
 
-<div class="container mx-auto p-8">
+<div class="container mx-auto p-4 md:p-8">
     <!-- Header -->
-    <header class="flex justify-between items-center mb-6">
-        <h1 class="text-4xl font-extrabold text-green-700">Empresas Cadastradas - Sistema de Caixa</h1>
-    </header>
-    <!-- Botão para voltar ao início -->
-    <div class="mb-6">
-        <a href="/" class="inline-flex items-center bg-green-100 text-green-800 px-4 py-2 rounded-md hover:bg-green-200 transition">
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                 viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3 12l2-2m0 0l7-7 7 7m-9 2v8m4-8v8m5-5h2a2 2 0 002-2V7a2 2 0 00-2-2h-2.5"></path>
-            </svg>
-            Início
-        </a>
-    </div>
-
-    <!-- Seleção de Usuário -->
-    <div class="bg-white shadow-lg rounded-lg p-6 mb-8">
-        <form th:action="@{/empresastf/usuario}" method="get" class="flex flex-col md:flex-row items-center gap-4">
-            <label for="usuario" class="text-lg font-semibold text-green-800">Selecione o Usuário:</label>
-            <select name="usuarioId" id="usuario" class="p-3 rounded-md w-full md:w-1/3 border border-gray-300 focus:ring-2 focus:ring-green-500 transition duration-300">
-                <option th:each="usuario : ${usuarios}"
-                        th:value="${usuario.id}"
-                        th:text="${usuario.nome}"></option>
-            </select>
-            <button type="submit" class="mt-4 md:mt-0 md:ml-4 bg-green-500 text-white hover:bg-green-600 py-2 px-4 rounded-md transition duration-300 transform hover:scale-105">
-                Buscar
-            </button>
-        </form>
-    </div>
-
-    <!-- Empresas do Usuário -->
-    <div th:if="${empresas}" class="bg-white shadow-lg rounded-lg p-6">
-        <h2 class="text-2xl font-semibold text-green-800 mb-6">Empresas</h2>
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            <div th:each="empresa : ${empresas}" class="bg-white border border-gray-200 rounded-lg shadow-md p-4 hover:shadow-xl transition-all duration-300 transform hover:scale-105">
-                <h3 class="text-xl font-medium text-gray-800 mb-4" th:text="${empresa.nome}"></h3>
-                <a th:href="@{/empresastf/{id}(id=${empresa.id})}" class="text-green-600 hover:text-green-700 text-sm font-medium transition-colors duration-200">Acessar</a>
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <span>Empresas</span>
+                </div>
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-700">Empresas Cadastradas</h1>
             </div>
         </div>
     </div>
 
+    <!-- Seleção de Usuário -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-6">
+        <form th:action="@{/empresastf/usuario}" method="get" class="flex flex-col md:flex-row items-end gap-4">
+            <div class="w-full md:w-1/3">
+                <label for="usuario" class="block text-sm font-medium text-emerald-700 mb-2">Filtrar por Responsável</label>
+                <select name="usuarioId" id="usuario" class="w-full p-3 rounded-xl border border-emerald-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition text-sm">
+                    <option value="">Todos os usuários</option>
+                    <option th:each="usuario : ${usuarios}"
+                            th:value="${usuario.id}"
+                            th:text="${usuario.nome}"></option>
+                </select>
+            </div>
+            <button type="submit" class="inline-flex items-center gap-2 bg-emerald-600 text-white hover:bg-emerald-700 py-3 px-6 rounded-xl transition shadow-sm">
+                <i data-lucide="search" class="w-4 h-4"></i>
+                Filtrar
+            </button>
+        </form>
+    </div>
+
+    <!-- Empresas -->
+    <div th:if="${empresas}" class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-xl font-bold text-emerald-800">Empresas</h2>
+            <span class="text-sm text-emerald-600"
+                  th:text="${#lists.size(empresas)} + ' encontrada(s)'"></span>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <a th:each="empresa : ${empresas}"
+               th:href="@{/empresastf/{id}(id=${empresa.id})}"
+               class="block bg-white border border-emerald-100 rounded-xl shadow-sm p-5 hover:shadow-md hover:border-emerald-300 transition-all duration-200">
+
+                <div class="flex items-start justify-between">
+                    <div class="flex items-center gap-3">
+                        <div class="bg-emerald-100 text-emerald-700 p-2 rounded-lg">
+                            <i data-lucide="building-2" class="w-5 h-5"></i>
+                        </div>
+                        <h3 class="font-semibold text-gray-800"
+                            th:text="${empresa.nome}">Empresa</h3>
+                    </div>
+                </div>
+
+                <div class="mt-4 inline-flex items-center gap-2 text-emerald-600 text-sm font-medium">
+                    Acessar
+                    <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                </div>
+            </a>
+        </div>
+    </div>
+
     <!-- Botão para criar nova empresa -->
-    <div class="mt-8 text-center">
-        <a href="/empresastf/nova" class="inline-block bg-green-600 text-white py-2 px-6 rounded-lg shadow-md hover:bg-green-700 transition transform hover:scale-105">
+    <div class="mt-6 flex justify-center">
+        <a href="/empresastf/nova" class="inline-flex items-center gap-2 bg-emerald-600 text-white py-3 px-6 rounded-xl shadow-sm hover:bg-emerald-700 transition">
+            <i data-lucide="plus" class="w-5 h-5"></i>
             Cadastrar Nova Empresa
         </a>
     </div>
 
 </div>
 
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

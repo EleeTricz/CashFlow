@@ -5,26 +5,41 @@
     <title>Importação FGTS</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="min-h-screen bg-emerald-50 from-emerald-50 via-white to-green-50">
+<body class="min-h-screen bg-emerald-50">
 
 <div class="max-w-5xl mx-auto px-6 py-10">
 
-    <!-- TOPO / LOGO -->
-    <div class="flex flex-col items-center mb-10">
-        <a th:href="@{/}" class="transition hover:scale-105 duration-300">
-            <img th:src="@{/img/logo-cashflow.png}"
-                 alt="CashFlow Logo"
-                 class="w-28 h-auto drop-shadow-md mb-4">
-        </a>
-
-        <h1 class="text-4xl font-bold text-emerald-800">
-            Importação de FGTS
-        </h1>
-
-        <p class="text-emerald-600 mt-2 text-center">
-            Faça upload das guias em PDF ou extratos TXT para importar os lançamentos
-        </p>
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <a href="/importartf/todas" class="hover:underline">Importações</a>
+                    <span>/</span>
+                    <span>FGTS</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-800">
+                    Importação de FGTS
+                </h1>
+                <p class="text-emerald-600 mt-1 text-sm">
+                    Faça upload das guias em PDF ou extratos TXT para importar os lançamentos
+                </p>
+            </div>
+            <a th:href="@{/importartf/todas}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Voltar
+            </a>
+        </div>
     </div>
 
     <!-- ALERTAS -->
@@ -146,12 +161,16 @@
     <!-- BOTÃO CANCELAR -->
     <div class="mt-10 flex justify-center">
         <a th:href="@{/importartf/todas}"
-           class="px-8 py-3 rounded-xl border border-emerald-300 text-emerald-700 font-semibold bg-white hover:bg-emerald-50 transition shadow-sm">
+           class="inline-flex items-center gap-2 px-8 py-3 rounded-xl border border-emerald-300 text-emerald-700 font-semibold bg-white hover:bg-emerald-50 transition shadow-sm">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
             Cancelar / Voltar
         </a>
     </div>
 
 </div>
 
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

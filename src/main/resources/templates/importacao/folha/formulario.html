@@ -6,32 +6,53 @@
     <title>Upload de Folha</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="bg-green-50 min-h-screen flex flex-col items-center justify-start py-10 px-4 font-sans">
+<body class="bg-emerald-50 min-h-screen font-sans">
 
-<!-- Título -->
-<h1 class="text-4xl font-bold text-green-800 mb-8">Upload de Arquivo da Folha (.txt)</h1>
+<div class="container mx-auto px-4 md:px-8 py-8">
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <a href="/importartf/todas" class="hover:underline">Importações</a>
+                    <span>/</span>
+                    <span>Folha</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-3xl md:text-4xl font-extrabold text-emerald-800">
+                    Upload de Folha (.txt)
+                </h1>
+            </div>
+            <a th:href="@{/importartf/todas}"
+               class="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Voltar
+            </a>
+        </div>
+    </div>
 
 <!-- Container do formulário -->
-<div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl p-10 border border-green-200">
+<div class="w-full max-w-2xl mx-auto bg-white rounded-2xl shadow-lg p-10 border border-emerald-100">
 
     <!-- Mensagem de sucesso -->
     <div th:if="${mensagem != null and !mensagem.startsWith('Erro:')}"
-         class="mb-6 flex items-center bg-green-100 text-green-800 border border-green-300 p-4 rounded-md">
-        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"></path>
-        </svg>
+         class="mb-6 flex items-center gap-2 bg-emerald-100 text-emerald-800 border border-emerald-300 p-4 rounded-xl">
+        <i data-lucide="check-circle" class="w-6 h-6"></i>
         <span th:text="${mensagem}"></span>
     </div>
 
     <!-- Mensagem de erro -->
     <div th:if="${mensagem != null and mensagem.startsWith('Erro:')}"
-         class="mb-6 flex items-center bg-red-100 text-red-800 border border-red-300 p-4 rounded-md">
-        <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-             viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
-        </svg>
+         class="mb-6 flex items-center gap-2 bg-red-100 text-red-800 border border-red-300 p-4 rounded-xl">
+        <i data-lucide="x-circle" class="w-6 h-6"></i>
         <span th:text="${mensagem}"></span>
     </div>
 
@@ -39,9 +60,9 @@
 
         <!-- Seleção da empresa -->
         <div>
-            <label for="empresaId" class="block text-lg font-medium text-green-800 mb-2">Empresa</label>
+            <label for="empresaId" class="block text-lg font-medium text-emerald-800 mb-2">Empresa</label>
             <select name="empresaId" id="empresaId" required
-                    class="w-full p-3 border border-green-300 rounded-md focus:ring-green-500 focus:border-green-500">
+                    class="w-full p-3 border border-emerald-300 rounded-xl focus:ring-emerald-500 focus:border-emerald-500">
                 <option value="" disabled selected>Selecione uma empresa</option>
                 <option th:each="empresa : ${empresas}"
                         th:value="${empresa.id}"
@@ -51,31 +72,34 @@
 
         <!-- Upload do arquivo -->
         <div>
-            <label for="file" class="block text-lg font-medium text-green-800 mb-2">Arquivo .txt</label>
+            <label for="file" class="block text-lg font-medium text-emerald-800 mb-2">Arquivo .txt</label>
             <input type="file" name="file" id="file" accept=".txt" required
-                   class="block w-full p-3 text-base text-green-800 border border-green-300 rounded-lg cursor-pointer bg-white focus:outline-none focus:ring-green-500 focus:border-green-500" />
+                   class="block w-full p-3 text-base text-emerald-800 border border-emerald-300 rounded-xl cursor-pointer bg-white focus:outline-none focus:ring-emerald-500 focus:border-emerald-500" />
         </div>
 
         <!-- Botões de ação -->
         <div class="flex justify-between items-center pt-4">
             <!-- Botão Cancelar -->
             <a th:href="@{/importartf/todas}"
-               class="flex items-center bg-green-100 text-green-800 px-6 py-3 rounded-md hover:bg-green-200 transition">
-                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="2"
-                     viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"></path>
-                </svg>
+               class="inline-flex items-center gap-2 bg-emerald-100 text-emerald-700 px-6 py-3 rounded-xl hover:bg-emerald-200 transition">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
                 Cancelar
             </a>
 
             <!-- Botão Enviar -->
             <button type="submit"
-                    class="inline-flex justify-center px-6 py-3 border border-green-600 shadow-md text-base rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none">
+                    class="inline-flex items-center gap-2 bg-emerald-600 text-white px-6 py-3 rounded-xl hover:bg-emerald-700 transition shadow-md">
+                <i data-lucide="upload" class="w-5 h-5"></i>
                 Enviar TXT
             </button>
         </div>
     </form>
 </div>
 
+</div>
+
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>

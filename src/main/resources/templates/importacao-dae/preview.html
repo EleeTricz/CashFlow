@@ -5,58 +5,98 @@
     <title>Pre-visualizacao DAE</title>
     <link rel="icon" type="image/png" th:href="@{/img/logo-cashflow.png}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 </head>
-<body class="min-h-screen bg-gradient-to-b from-green-50 to-emerald-100 px-4 py-10">
+<body class="min-h-screen bg-emerald-50 font-sans">
 
-<div class="max-w-6xl mx-auto bg-white/95 border border-green-200 p-8 md:p-10 rounded-3xl shadow-xl">
-
-    <div class="mb-7 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div>
-            <p class="text-sm font-medium text-green-600 uppercase tracking-wide">Revisao</p>
-            <h1 class="text-3xl font-bold text-green-800">Pre-visualizacao da Importacao DAE</h1>
-            <p class="text-green-700 mt-1">Confira os registros antes de confirmar o lancamento para a empresa selecionada.</p>
-        </div>
-        <div class="bg-green-50 border border-green-200 text-green-800 rounded-xl px-4 py-3 text-sm">
-            Total de registros:
-            <span class="font-bold" th:text="${#lists.size(registros)}">0</span>
+<div class="container mx-auto px-4 md:px-8 py-8">
+    <!-- Header consolidado com navegação -->
+    <div class="bg-white rounded-2xl shadow-sm border border-emerald-100 p-6 mb-6">
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <!-- Breadcrumb -->
+                <div class="flex items-center gap-2 text-emerald-600 text-sm font-medium mb-1">
+                    <a href="/" class="hover:underline flex items-center gap-1">
+                        <i data-lucide="home" class="w-4 h-4"></i>
+                        Início
+                    </a>
+                    <span>/</span>
+                    <a href="/importartf/todas" class="hover:underline">Importações</a>
+                    <span>/</span>
+                    <a href="/importacao-dae" class="hover:underline">DAE</a>
+                    <span>/</span>
+                    <span>Pré-visualização</span>
+                </div>
+                <!-- Título -->
+                <h1 class="text-2xl md:text-3xl font-bold text-emerald-800">
+                    Pré-visualização DAE
+                </h1>
+            </div>
+            <div class="flex gap-2">
+                <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-4 py-2 text-sm flex items-center gap-2">
+                    <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                    <span th:text="${#lists.size(registros)} + ' registros'"></span>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="overflow-x-auto rounded-2xl border border-green-200">
-        <table class="w-full text-sm">
-            <thead>
-        <tr class="bg-green-100 text-green-900">
-            <th class="p-3 text-left font-semibold">Natureza</th>
-            <th class="p-3 text-left font-semibold">Data</th>
-            <th class="p-3 text-right font-semibold">Valor</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="r : ${registros}" class="odd:bg-white even:bg-green-50/50 border-t border-green-100">
-            <td class="p-3 text-green-900 font-medium" th:text="${r.naturezaReceita}"></td>
-            <td class="p-3 text-green-800" th:text="${r.dataPagamento}"></td>
-            <td class="p-3 text-right text-green-800 font-semibold" th:text="${r.valor}"></td>
-        </tr>
-        </tbody>
-    </table>
+    <div class="max-w-6xl mx-auto bg-white rounded-2xl shadow-lg border border-emerald-100 p-8 md:p-10">
+
+        <div class="mb-7 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div>
+                <p class="text-sm font-medium text-emerald-600 uppercase tracking-wide">Revisao</p>
+                <h1 class="text-3xl font-bold text-emerald-800">Pre-visualizacao da Importacao DAE</h1>
+                <p class="text-emerald-700 mt-1">Confira os registros antes de confirmar o lancamento para a empresa selecionada.</p>
+            </div>
+            <div class="bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl px-4 py-3 text-sm">
+                Total de registros:
+                <span class="font-bold" th:text="${#lists.size(registros)}">0</span>
+            </div>
+        </div>
+
+        <div class="overflow-x-auto rounded-2xl border border-emerald-200">
+            <table class="w-full text-sm">
+                <thead>
+                    <tr class="bg-emerald-100 text-emerald-900">
+                        <th class="p-3 text-left font-semibold">Natureza</th>
+                        <th class="p-3 text-left font-semibold">Data</th>
+                        <th class="p-3 text-right font-semibold">Valor</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr th:each="r : ${registros}" class="odd:bg-white even:bg-emerald-50/50 border-t border-emerald-100">
+                        <td class="p-3 text-emerald-900 font-medium" th:text="${r.naturezaReceita}"></td>
+                        <td class="p-3 text-emerald-800" th:text="${r.dataPagamento}"></td>
+                        <td class="p-3 text-right text-emerald-800 font-semibold" th:text="${r.valor}"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <form method="post"
+              th:action="@{/importacao-dae/confirmar}"
+              class="mt-7 flex flex-col sm:flex-row gap-3">
+            <input type="hidden" name="empresaId" th:value="${empresaId}">
+
+            <button type="submit"
+                    class="inline-flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-6 py-3 rounded-xl transition">
+                <i data-lucide="check" class="w-5 h-5"></i>
+                Confirmar Importação
+            </button>
+            <a href="/importacao-dae"
+               class="inline-flex items-center justify-center gap-2 bg-white hover:bg-emerald-50 text-emerald-700 border border-emerald-300 font-semibold px-6 py-3 rounded-xl transition text-center">
+                <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                Voltar e ajustar
+            </a>
+        </form>
+
     </div>
-
-    <form method="post"
-          th:action="@{/importacao-dae/confirmar}"
-          class="mt-7 flex flex-col sm:flex-row gap-3">
-        <input type="hidden" name="empresaId" th:value="${empresaId}">
-
-        <button type="submit"
-                class="bg-green-600 hover:bg-green-700 text-white font-semibold px-6 py-3 rounded-xl transition">
-            Confirmar Importacao
-        </button>
-        <a href="/importacao-dae"
-           class="bg-white hover:bg-green-50 text-green-700 border border-green-300 font-semibold px-6 py-3 rounded-xl transition text-center">
-            Voltar e ajustar arquivo
-        </a>
-    </form>
 
 </div>
 
+<script>
+    lucide.createIcons();
+</script>
 </body>
 </html>
